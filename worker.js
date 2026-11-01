@@ -455,7 +455,7 @@ async function handleChatFile(request, env) {
           headers: { "Content-Type": "application/json", "Authorization": "Bearer " + env.GROQ_API_KEY },
           body: JSON.stringify({
             model: "qwen/qwen3.8-27b",
-            messages: ([{ role: "system", content: visualPrompt }, { role: "user", content: [{ type: "text", text: message || "Analyze this image and extract its important details." }, ...content.slice(1)] }] as any),
+            messages: /** @type {any} */ ([{ role: "system", content: visualPrompt }, { role: "user", content: [{ type: "text", text: message || "Analyze this image and extract its important details." }, ...content.slice(1)] }]),
             max_completion_tokens: 600,
             temperature: 0.2
           }),
