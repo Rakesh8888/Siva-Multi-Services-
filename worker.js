@@ -60,6 +60,9 @@ SOFTWARE RESELLER AND SCHOOL SOFTWARE SUPPORT
 
 ACCURACY:
 - Answer the exact question first, in concise, simple steps.
+- For questions about SIVA Multi Services, use only facts explicitly stated in this system prompt or verified in the website content. Do not fill gaps with assumptions.
+- If a requested company detail, service, fee, vacancy, employer, timeline, availability, or policy is not confirmed in the information available to you, clearly say you do not have verified information. Do not guess or make up an answer.
+- When you cannot give a verified answer, append this exact marker at the very end of your reply: [[SIVA_WHATSAPP_HANDOFF]]. Do not explain or alter the marker. The website will turn it into a WhatsApp contact link.
 - Never invent current vacancies, employers, salary figures, visa rules, prices, fees, interview calls, approvals, partnerships, or bookings.
 - Separate confirmed facts from examples or estimates. If information is not available or current verification is needed, say so plainly.
 - Never promise a job, interview, visa, immigration result, or booking.
@@ -177,10 +180,6 @@ async function handleChat(request, env) {
   if (request.method !== "POST") {
     return jsonResponse({ error: "Method not allowed" }, 405, request);
   }
-  if (!env.GEMINI_API_KEY) {
-    return jsonResponse({ error: "Gemini AI is not configured. Add GEMINI_API_KEY as a Cloudflare Worker secret." }, 503, request);
-  }
-
   try {
     const body = await request.json();
     const message = typeof body?.message === "string" ? body.message.trim() : "";
@@ -215,11 +214,11 @@ async function handleChat(request, env) {
       }
     }
 
-    let geminiProblem = "Gemini request could not be completed";
+    let geminiProblem = env.GEMINI_API_KEY ? "Gemini request could not be completed" : "Gemini API key is not configured";
     let geminiStatus = 0;
     let geminiQuotaReached = false;
     const models = [GEMINI_MODEL, "gemini-3.1-flash-lite"];
-    for (let index = 0; index < models.length; index++) {
+    if (env.GEMINI_API_KEY) for (let index = 0; index < models.length; index++) {
       const model = models[index];
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), body?.spoken === true ? 12000 : 20000);
@@ -269,8 +268,8 @@ async function handleChat(request, env) {
 
     // If Gemini is blocked in the caller's region, use the configured Groq key as a backup.
     // This keeps text, voice-message, and live-voice replies working without changing the website.
-    const regionBlocked = geminiStatus === 403 || /user location is not supported|location.*not supported|region.*not supported/i.test(geminiProblem);
-    if (regionBlocked && env.GROQ_API_KEY) {
+    const geminiUnavailable = !env.GEMINI_API_KEY || geminiStatus !== 0 || /timed out|network error|could not be completed|empty answer/i.test(geminiProblem);
+    if (geminiUnavailable && env.GROQ_API_KEY) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), body?.spoken === true ? 12000 : 20000);
       try {
@@ -312,8 +311,9 @@ async function handleChat(request, env) {
         : "AI service is temporarily unavailable. Please try again later.",
       provider: "gemini",
       providerMessage: String(geminiProblem).slice(0, 300),
-      fallbackConfigured: Boolean(env.GROQ_API_KEY)
-    }, geminiQuotaReached ? 429 : 502, request);
+      fallbackConfigured: Boolean(env.GROQ_API_KEY),
+      whatsappUrl: "https://wa.me/9182641172?text=" + encodeURIComponent("Hello Siva Multi Services, I need help with my enquiry.")
+    }, !env.GEMINI_API_KEY && !env.GROQ_API_KEY ? 503 : (geminiQuotaReached ? 429 : 502), request);
   } catch (error) {
     console.error("SIVA Gemini AI request error:", String(error?.stack || error?.message || error?.name || "Unknown error").slice(0, 700));
     return jsonResponse({
