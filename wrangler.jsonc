@@ -11,5 +11,11 @@
   },
   "ai": {
     "binding": "AI"
-  }
+  },
+  "vectorize": [
+    {
+      "binding": "SIVA_KNOWLEDGE",
+      "index_name": "siva-ai-knowledge"
+    }
+  ]
 }
