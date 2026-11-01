@@ -1,12 +1,10 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 300" role="img" aria-labelledby="title desc">
-<title id="title">ELITE SERVICES</title>
-<desc id="desc">Elite Services wordmark for travel, technology and assistance services.</desc>
-<defs>
-  <linearGradient id="elite" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#b88a58"/><stop offset="1" stop-color="#6b4226"/></linearGradient>
-</defs>
-<rect width="1200" height="300" rx="28" fill="#fffaf2"/>
-<circle cx="145" cy="150" r="82" fill="url(#elite)"/>
-<path d="M104 151l27 27 55-61" fill="none" stroke="#fffaf2" stroke-width="15" stroke-linecap="round" stroke-linejoin="round"/>
-<text x="270" y="145" font-family="Arial,Helvetica,sans-serif" font-size="94" font-weight="800" letter-spacing="1" fill="#4b3022">ELITE</text>
-<text x="275" y="220" font-family="Arial,Helvetica,sans-serif" font-size="58" font-weight="700" letter-spacing="12" fill="url(#elite)">SERVICES</text>
+<title id="title">SIVA MULTI SERVICES</title>
+<desc id="desc">SIVA MULTI SERVICES wordmark for travel, technology and people services.</desc>
+<defs><linearGradient id="siva" x1="0" y1="0" x2="1" y2="1"><stop stop-color="#4c9b68"/><stop offset="1" stop-color="#174b35"/></linearGradient></defs>
+<rect width="1200" height="300" rx="28" fill="#fff"/>
+<circle cx="145" cy="150" r="82" fill="url(#siva)"/>
+<path d="M92 154c45-9 80-36 111-77-8 42-34 84-81 111l-30-34z" fill="#fff"/>
+<text x="270" y="145" font-family="Arial,Helvetica,sans-serif" font-size="94" font-weight="800" letter-spacing="1" fill="#174b35">SIVA</text>
+<text x="275" y="220" font-family="Arial,Helvetica,sans-serif" font-size="58" font-weight="700" letter-spacing="8" fill="#4c9b68">MULTI SERVICES</text>
 </svg>
