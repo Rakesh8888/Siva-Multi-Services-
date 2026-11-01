@@ -1,0 +1,43 @@
+name: Create SIVA Vectorize index
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  create-index:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create index if it does not already exist
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${CLOUDFLARE_API_TOKEN:-}" || -z "${CLOUDFLARE_ACCOUNT_ID:-}" ]]; then
+            echo "::error::GitHub Actions secrets CLOUDFLARE_API_TOKEN and CLOUDFLARE_ACCOUNT_ID must both be configured."
+            exit 1
+          fi
+
+          BASE="https://api.cloudflare.com/client/v4/accounts/${CLOUDFLARE_ACCOUNT_ID}/vectorize/v2/indexes"
+          LIST="$(curl --silent --show-error --fail-with-body \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            "${BASE}")"
+
+          if echo "${LIST}" | jq -e '.result[]? | select(.name == "siva-ai-knowledge")' >/dev/null; then
+            echo "Vectorize index siva-ai-knowledge already exists. No changes made."
+            exit 0
+          fi
+
+          BODY='{"name":"siva-ai-knowledge","description":"SIVA Multi Services multilingual knowledge retrieval","config":{"dimensions":1024,"metric":"cosine"}}'
+          RESULT="$(curl --silent --show-error --fail-with-body \
+            -X POST "${BASE}" \
+            -H "Authorization: Bearer ${CLOUDFLARE_API_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data "${BODY}")"
+
+          echo "${RESULT}" | jq -e '.success == true' >/dev/null
+          echo "Successfully created Vectorize index siva-ai-knowledge (1024 dimensions, cosine)."
