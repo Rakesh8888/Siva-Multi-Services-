@@ -206,7 +206,7 @@ async function handleChat(request, env) {
     ];
 
     // Gemini with Google Search grounding for questions about changing information.
-    if (needsCurrentResearch(message)) {
+    if (env.GEMINI_API_KEY && needsCurrentResearch(message)) {
       try {
         const grounded = await answerWithGroundedSearch(message, history, language, env);
         if (grounded) return jsonResponse({ ...grounded, provider: "gemini" }, 200, request);
