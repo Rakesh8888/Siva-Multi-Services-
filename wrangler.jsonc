@@ -8,5 +8,14 @@
     "directory": ".",
     "binding": "ASSETS",
     "run_worker_first": ["/api/*"]
-  }
+  },
+  "ai": {
+    "binding": "AI"
+  },
+  "vectorize": [
+    {
+      "binding": "SIVA_KNOWLEDGE",
+      "index_name": "siva-ai-knowledge"
+    }
+  ]
 }
