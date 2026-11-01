@@ -57,7 +57,7 @@ jobs:
           }
           const embedding = await api("/ai/run/@cf/baai/bge-m3", {
             method: "POST",
-            body: JSON.stringify({ text: ["Elite Multi Services multilingual knowledge index dimension check"] })
+            body: JSON.stringify({ text: ["SIVA MULTI SERVICES multilingual knowledge index dimension check"] })
           });
           const vectors = embedding?.data || embedding?.result?.data;
           if (!Array.isArray(vectors) || !Array.isArray(vectors[0]) || !vectors[0].length) {
@@ -78,7 +78,7 @@ jobs:
               method: "POST",
               body: JSON.stringify({
                 name: "siva-ai-knowledge",
-                description: "Multilingual knowledge base for Elite Multi Services AI assistant",
+                description: "Multilingual knowledge base for SIVA MULTI SERVICES AI assistant",
                 config: { dimensions, metric: "cosine" }
               })
             });
