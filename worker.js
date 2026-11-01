@@ -625,7 +625,8 @@ export default {
       return jsonResponse({ ok: true, aiConfigured: Boolean(env.GEMINI_API_KEY || env.GROQ_API_KEY), aiProvider: env.GEMINI_API_KEY ? "gemini-with-groq-fallback" : (env.GROQ_API_KEY ? "groq" : "none"), groqFallbackConfigured: Boolean(env.GROQ_API_KEY), duffelConfigured: Boolean(env.DUFFEL_ACCESS_TOKEN) }, 200, request);
     }
 
-    if (url.pathname === "/api/chat-file") return handleChatFile(request, env);\n    if (url.pathname === "/api/knowledge/ingest") return handleKnowledgeIngest(request, env);
+    if (url.pathname === "/api/chat-file") return handleChatFile(request, env);
+    if (url.pathname === "/api/knowledge/ingest") return handleKnowledgeIngest(request, env);
     if (url.pathname === "/api/chat") {
       return handleChat(request, env);
     }
