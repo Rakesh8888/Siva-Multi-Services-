@@ -1,0 +1,98 @@
+name: Seed SIVA AI knowledge base
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  seed-knowledge:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Add verified SIVA business information to Vectorize
+        env:
+          RAG_ADMIN_TOKEN: ${{ secrets.RAG_ADMIN_TOKEN }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          if [[ -z "${RAG_ADMIN_TOKEN:-}" ]]; then
+            echo "::error::Add the RAG_ADMIN_TOKEN secret in GitHub Actions before running this workflow."
+            exit 1
+          fi
+
+          cat > knowledge.json <<'JSON'
+          {
+            "documents": [
+              {
+                "id": "siva-about",
+                "source": "SIVA Multi Services",
+                "text": "SIVA Multi Services provides customer enquiry, information, guidance and application assistance in travel, visa application assistance, overseas job application guidance, cruise-ship job application guidance, software reseller/referral assistance, and B2B/travel-agent services. The company must not be described as a government office, embassy, visa issuer, employer, or authorized recruiter unless that status is separately verified."
+              },
+              {
+                "id": "siva-travel",
+                "source": "SIVA Multi Services",
+                "text": "Travel assistance: SIVA Multi Services can help customers with enquiries and guidance for domestic and international tour packages, and flight, train and bus ticket booking enquiries. Actual fares, schedules, seats, availability, booking confirmation, payment and ticket issuance must be checked through the relevant official provider or a verified booking platform. Do not claim a ticket has been booked unless confirmation is actually received."
+              },
+              {
+                "id": "siva-visa",
+                "source": "SIVA Multi Services",
+                "text": "Visa assistance: SIVA Multi Services provides visa application assistance and travel guidance, including general information for tourist or visitor visas, business travel visas, and work-visa information where relevant. Visa eligibility, documents, fees, processing times and rules depend on the destination country's current official requirements and the applicant's circumstances. Always direct customers to the destination government's official immigration or embassy website for current requirements. SIVA Multi Services does not issue or approve visas and cannot guarantee approval."
+              },
+              {
+                "id": "siva-cruise-jobs",
+                "source": "SIVA Multi Services",
+                "text": "Cruise-ship job guidance: SIVA Multi Services provides general career information and optional, separately chargeable assistance with CV/resume preparation, interview preparation, and navigating or filling job application forms on an official employer website. Customers choose vacancies, verify eligibility, check all information, and personally review and submit applications. SIVA Multi Services is not a cruise employer or an authorized recruiter unless independently verified. No job, vacancy, interview, salary, visa or offer is guaranteed. Fees, if any, must be disclosed and agreed before work begins. SIVA Multi Services does not provide STCW or maritime courses, seafarer certificates, medical examinations, or recruitment/placement through this general guidance."
+              },
+              {
+                "id": "siva-overseas-jobs",
+                "source": "SIVA Multi Services",
+                "text": "Overseas job application guidance: SIVA Multi Services may provide general information and optional help with CV preparation, interview preparation and navigating or filling application forms. A customer must verify the employer, vacancy, recruitment channel, eligibility, salary and contract directly through official sources. Do not invent job openings, employers, salaries, fees, interviews, work permits or employment offers. For recruitment from India, customers should check the Ministry of External Affairs guidance and eMigrate portal: https://www.mea.gov.in/oe-faq.htm and https://emigrate.gov.in/."
+              },
+              {
+                "id": "siva-gulf",
+                "source": "SIVA Multi Services",
+                "text": "Gulf travel and employment enquiries: Customers may ask SIVA Multi Services for general guidance about Gulf-related travel and overseas job application enquiries. Medical tests, visa stamping, work permits, job availability, fees, processing times and eligibility must be confirmed with the relevant government authority, authorized medical centre, employer or official provider. Do not claim these services are directly delivered by SIVA Multi Services unless the specific service and authorization have been confirmed."
+              },
+              {
+                "id": "siva-europe",
+                "source": "SIVA Multi Services",
+                "text": "Europe tours and job enquiries: SIVA Multi Services can provide general enquiry and application guidance relating to Europe tours and overseas job applications. Schengen visa rules, entry conditions, work authorization, job vacancies, employer details, fees and processing times change and must be verified with official government, embassy, employer or provider sources. A tourist visa does not itself authorize employment. Never promise a visa, job, salary or approval."
+              },
+              {
+                "id": "siva-software",
+                "source": "SIVA Multi Services",
+                "text": "Software reseller and referral assistance: SIVA Multi Services can help customers explore software products, subscriptions, licenses and school-management or parent-communication apps when an authorized vendor/reseller arrangement and product availability are confirmed. Confirm vendor identity, license scope, device and user limits, features, compatibility, pricing, renewal, support, data privacy, cancellation and refund terms before purchase. Do not claim to be an authorized reseller, publisher, developer or official partner without verification. Never ask for passwords, OTPs or payment-card details."
+              },
+              {
+                "id": "siva-b2b",
+                "source": "SIVA Multi Services",
+                "text": "B2B and travel-agent enquiries: SIVA Multi Services welcomes enquiries from businesses and travel agents about possible service cooperation. The exact scope, provider authorization, commercial terms, availability, commissions and service-level commitments must be confirmed individually in writing. Do not invent partnerships, commission rates or guaranteed business outcomes."
+              },
+              {
+                "id": "siva-contact",
+                "source": "SIVA Multi Services",
+                "text": "For a personal enquiry, customers should use the Contact Us section or WhatsApp enquiry button on the SIVA Multi Services website. The AI assistant must not reveal or repeat the business phone number. Collect only the minimum information needed for an enquiry and never request passwords, OTPs or card details."
+              },
+              {
+                "id": "siva-pricing",
+                "source": "SIVA Multi Services",
+                "text": "Pricing and fees: No specific service price, commission, visa fee, job-assistance fee, tour price or software subscription price is confirmed in this knowledge base. Do not guess or quote a price. Ask the customer to submit an enquiry and say that the applicable price and terms must be confirmed before the service begins. Government, airline, employer and third-party charges may be separate and must be verified with the relevant provider."
+              },
+              {
+                "id": "siva-booking-status",
+                "source": "SIVA Multi Services",
+                "text": "Booking status and availability: The AI assistant can provide general booking guidance but must not claim live seat availability, live fare, confirmed reservation, ticket issuance or successful payment unless a connected provider returns a verified result. Ask for the travel route and date only when needed, then direct the customer to the booking enquiry process or verified provider."
+              }
+            ]
+          }
+          JSON
+
+          curl --silent --show-error --fail-with-body \
+            -X POST "https://siva-multi-services.sivaramtotti.workers.dev/api/knowledge/ingest" \
+            -H "Authorization: Bearer ${RAG_ADMIN_TOKEN}" \
+            -H "Content-Type: application/json" \
+            --data-binary @knowledge.json | tee response.json
+
+          jq -e '.ok == true and .indexed == 12' response.json >/dev/null
+          echo "Successfully indexed 12 SIVA knowledge documents."
