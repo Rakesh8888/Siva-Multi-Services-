@@ -41,7 +41,7 @@ jobs:
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
         run: |
           node --input-type=module <<'NODE'
-          const token = process.env.CLOUDFLARE_API_TOKEN;
+          const token = (process.env.CLOUDFLARE_API_TOKEN || "").replace(/\\s+/g, "");
           const account = process.env.CLOUDFLARE_ACCOUNT_ID;
           if (!token || !account) throw new Error("Cloudflare GitHub Actions secrets are missing.");
           const base = `https://api.cloudflare.com/client/v4/accounts/${account}`;
