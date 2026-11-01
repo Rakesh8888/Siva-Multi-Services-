@@ -1,5 +1,61 @@
 const GEMINI_MODEL = "gemini-3.5-flash-lite";
 
+const RAG_EMBEDDING_MODEL = "@cf/baai/bge-m3";
+
+async function embedTexts(env, texts) {
+  if (!env.AI) throw new Error("Cloudflare Workers AI binding AI is missing");
+  const result = await env.AI.run(RAG_EMBEDDING_MODEL, { text: texts });
+  const vectors = result?.data || result?.result?.data;
+  if (!Array.isArray(vectors) || vectors.length !== texts.length) throw new Error("Embedding model returned an unexpected response");
+  return vectors;
+}
+
+async function retrieveKnowledge(message, env) {
+  if (!env.AI || !env.SIVA_KNOWLEDGE) return "";
+  try {
+    const [vector] = await embedTexts(env, [message]);
+    const matches = await env.SIVA_KNOWLEDGE.query(vector, { topK: 5, returnMetadata: "all" });
+    const snippets = (matches?.matches || [])
+      .filter(item => Number(item.score || 0) >= 0.35 && item.metadata?.text)
+      .map(item => String(item.metadata.text).slice(0, 1800));
+    return snippets.length ? "\\n\\nVERIFIED BUSINESS KNOWLEDGE (use only when relevant; do not invent beyond it):\\n" + snippets.join("\\n---\\n") : "";
+  } catch (error) {
+    console.error("SIVA RAG retrieval skipped:", String(error?.message || error).slice(0, 180));
+    return "";
+  }
+}
+
+async function handleKnowledgeIngest(request, env) {
+  if (request.method !== "POST") return jsonResponse({ error: "Method not allowed" }, 405, request);
+  if (!env.RAG_ADMIN_TOKEN || request.headers.get("Authorization") !== "Bearer " + env.RAG_ADMIN_TOKEN) {
+    return jsonResponse({ error: "Unauthorized" }, 401, request);
+  }
+  if (!env.AI || !env.SIVA_KNOWLEDGE) return jsonResponse({ error: "Workers AI or Vectorize binding is missing" }, 503, request);
+  try {
+    const body = await request.json();
+    const docs = Array.isArray(body?.documents) ? body.documents : [];
+    if (!docs.length || docs.length > 100) return jsonResponse({ error: "Send 1 to 100 documents" }, 400, request);
+    const cleaned = docs.map((doc, i) => ({
+      id: String(doc?.id || "siva-" + Date.now() + "-" + i).replace(/[^a-zA-Z0-9_-]/g, "-").slice(0, 64),
+      text: String(doc?.text || "").trim().slice(0, 1800),
+      source: String(doc?.source || "SIVA Multi Services").slice(0, 120)
+    })).filter(doc => doc.text);
+    if (!cleaned.length) return jsonResponse({ error: "No usable document text was supplied" }, 400, request);
+    const embeddings = await embedTexts(env, cleaned.map(doc => doc.text));
+    const vectors = cleaned.map((doc, i) => ({
+      id: doc.id,
+      values: embeddings[i],
+      metadata: { text: doc.text, source: doc.source }
+    }));
+    await env.SIVA_KNOWLEDGE.upsert(vectors);
+    return jsonResponse({ ok: true, indexed: vectors.length, model: RAG_EMBEDDING_MODEL }, 200, request);
+  } catch (error) {
+    console.error("SIVA knowledge ingestion failed:", String(error?.message || error).slice(0, 200));
+    return jsonResponse({ error: "Knowledge indexing failed. Check Vectorize dimensions and Workers AI binding." }, 500, request);
+  }
+}
+
+
 function normalizeLanguage(message, requestedLanguage) {
   const text = String(message || "");
   const requested = String(requestedLanguage || "").trim().toLowerCase();
@@ -193,7 +249,7 @@ async function handleChat(request, env) {
       .filter(x => x && (x.role === "user" || x.role === "assistant") && typeof x.content === "string")
       .slice(body?.spoken === true ? -2 : -4)
       .map(x => ({ role: x.role, content: x.content.slice(body?.spoken === true ? -500 : -900) })) : [];
-    const systemPrompt = SYSTEM_PROMPT(language) + (body?.spoken === true
+    const ragContext = await retrieveKnowledge(message, env);\n    const systemPrompt = SYSTEM_PROMPT(language) + ragContext + (body?.spoken === true
       ? "\n\nVOICE RESPONSE SPEED: This is a spoken conversation. Answer immediately and briefly in 1–3 short sentences, usually under 45 words. Put the direct answer first. Avoid long lists, headings, markdown symbols, and unnecessary introductions. Ask at most one short follow-up question."
       : "");
     const geminiContents = [
@@ -568,7 +624,7 @@ export default {
       return jsonResponse({ ok: true, aiConfigured: Boolean(env.GEMINI_API_KEY || env.GROQ_API_KEY), aiProvider: env.GEMINI_API_KEY ? "gemini-with-groq-fallback" : (env.GROQ_API_KEY ? "groq" : "none"), groqFallbackConfigured: Boolean(env.GROQ_API_KEY), duffelConfigured: Boolean(env.DUFFEL_ACCESS_TOKEN) }, 200, request);
     }
 
-    if (url.pathname === "/api/chat-file") return handleChatFile(request, env);
+    if (url.pathname === "/api/chat-file") return handleChatFile(request, env);\n    if (url.pathname === "/api/knowledge/ingest") return handleKnowledgeIngest(request, env);
     if (url.pathname === "/api/chat") {
       return handleChat(request, env);
     }
