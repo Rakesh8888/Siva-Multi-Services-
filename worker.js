@@ -249,7 +249,8 @@ async function handleChat(request, env) {
       .filter(x => x && (x.role === "user" || x.role === "assistant") && typeof x.content === "string")
       .slice(body?.spoken === true ? -2 : -4)
       .map(x => ({ role: x.role, content: x.content.slice(body?.spoken === true ? -500 : -900) })) : [];
-    const ragContext = await retrieveKnowledge(message, env);\n    const systemPrompt = SYSTEM_PROMPT(language) + ragContext + (body?.spoken === true
+    const ragContext = await retrieveKnowledge(message, env);
+    const systemPrompt = SYSTEM_PROMPT(language) + ragContext + (body?.spoken === true
       ? "\n\nVOICE RESPONSE SPEED: This is a spoken conversation. Answer immediately and briefly in 1–3 short sentences, usually under 45 words. Put the direct answer first. Avoid long lists, headings, markdown symbols, and unnecessary introductions. Ask at most one short follow-up question."
       : "");
     const geminiContents = [
