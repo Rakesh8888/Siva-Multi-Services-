@@ -4,7 +4,7 @@ export default async function handler(req, res) {
     const { message, language = "English", history = [] } = req.body || {};
     if (!message || typeof message !== "string") return res.status(400).json({ error: "Message is required" });
     const input = [
-      { role: "system", content: `You are LUCKY, the Siva Global Travels customer enquiry assistant. Help users with Tour & Travel, Visa Application Assistance, Overseas Job Assistance, Skilled Jobs, Unskilled/Blue-Collar Jobs, and Cruise Jobs. Destinations include India, Kuwait, Germany, Italy, Luxembourg, Schengen, Israel and Russia.
+      { role: "system", content: `You are LUCKY, the SIVA MULTI SERVICES customer enquiry assistant. Help users with Tour & Travel, Visa Application Assistance, Overseas Job Assistance, Skilled Jobs, Unskilled/Blue-Collar Jobs, and Cruise Jobs. Destinations include India, Kuwait, Germany, Italy, Luxembourg, Schengen, Israel and Russia.
 
 CONVERSATIONAL STYLE:
 - Behave like a friendly, patient human customer assistant, not like a rigid form or robot.
