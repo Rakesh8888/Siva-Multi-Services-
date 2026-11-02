@@ -382,6 +382,42 @@ async function handleChat(request, env) {
   }
 }
 
+async function handleVoiceTranscription(request, env) {
+  if (request.method !== "POST") return jsonResponse({ error: "Method not allowed" }, 405, request);
+  if (!env.GROQ_API_KEY) return jsonResponse({ error: "Voice transcription is not configured. Add the Groq API key to the Cloudflare Worker secrets." }, 503, request);
+  try {
+    const form = await request.formData();
+    const audio = form.get("audio");
+    const language = String(form.get("language") || "auto").slice(0, 12);
+    if (!(audio instanceof File)) return jsonResponse({ error: "No voice recording was received." }, 400, request);
+    if (audio.size < 1000) return jsonResponse({ error: "The recording is too short. Please speak for a little longer." }, 400, request);
+    if (audio.size > 12 * 1024 * 1024) return jsonResponse({ error: "Voice recording is too large. Please record a shorter message." }, 413, request);
+    const data = new FormData();
+    data.append("file", audio, "siva-voice-" + Date.now() + (audio.type.includes("mp4") ? ".mp4" : ".webm"));
+    data.append("model", "whisper-large-v3-turbo");
+    data.append("response_format", "json");
+    const locale = ({te:"te",en:"en",hi:"hi",ta:"ta",kn:"kn",ml:"ml",ur:"ur",ar:"ar",bn:"bn"})[language];
+    if (locale) data.append("language", locale);
+    const response = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + env.GROQ_API_KEY },
+      body: data,
+      signal: AbortSignal.timeout(45000)
+    });
+    const result = await response.json().catch(() => ({}));
+    if (!response.ok) {
+      console.error("SIVA voice transcription error:", response.status, String(result?.error?.message || "").slice(0, 180));
+      return jsonResponse({ error: "Voice transcription failed. " + String(result?.error?.message || ("HTTP " + response.status)).slice(0, 160) }, response.status === 429 ? 429 : 502, request);
+    }
+    const transcript = String(result?.text || "").trim();
+    if (!transcript) return jsonResponse({ error: "No speech was detected. Please try speaking more clearly." }, 422, request);
+    return jsonResponse({ text: transcript, model: "whisper-large-v3-turbo" }, 200, request);
+  } catch (error) {
+    console.error("SIVA voice transcription failed:", String(error?.message || error).slice(0, 180));
+    return jsonResponse({ error: "Voice transcription could not be completed. Please try again." }, 502, request);
+  }
+}
+
 async function handleChatFile(request, env) {
   const contentLength = Number(request.headers.get("Content-Length") || 0);
   // Allow the supported 20 MB video upload plus base64/frame overhead, while rejecting oversized bodies.
@@ -513,6 +549,7 @@ export default {
       return jsonResponse({ ok: true, aiConfigured: Boolean(env.GEMINI_API_KEY || env.GROQ_API_KEY), aiProvider: env.GEMINI_API_KEY ? "gemini-with-groq-fallback" : (env.GROQ_API_KEY ? "groq" : "none"), groqFallbackConfigured: Boolean(env.GROQ_API_KEY) }, 200, request);
     }
 
+    if (url.pathname === "/api/transcribe") return handleVoiceTranscription(request, env);
     if (url.pathname === "/api/chat-file") return handleChatFile(request, env);
     if (url.pathname === "/api/knowledge/ingest") return handleKnowledgeIngest(request, env);
     if (url.pathname === "/api/chat") {
