@@ -166,6 +166,7 @@ function corsHeaders(request) {
     requestOrigin,
     "https://siva-global-travels-3d.vercel.app",
     "https://sivaglobaltravels.vercel.app",
+    "https://siva-multi-services.vercel.app",
     "https://rakesh8888.github.io"
   ]);
   return {
