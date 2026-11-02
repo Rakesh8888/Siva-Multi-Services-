@@ -363,6 +363,26 @@ async function handleChat(request, env) {
       }
     }
 
+    // Final fallback: use the already-supported Cloudflare Workers AI binding
+    // when Gemini is unavailable in the caller's region and Groq is unavailable.
+    if (geminiUnavailable && env.AI && typeof env.AI.run === "function") {
+      try {
+        const result = await env.AI.run("@cf/meta/llama-3.3-70b-instruct-fp8-fast", {
+          messages: [
+            { role: "system", content: systemPrompt },
+            ...history.map(x => ({ role: x.role === "assistant" ? "assistant" : "user", content: x.content })),
+            { role: "user", content: message }
+          ],
+          max_tokens: body?.spoken === true ? 180 : 600,
+          temperature: body?.spoken === true ? 0.2 : 0.3
+        });
+        const reply = String(result?.response || result?.result?.response || "").trim();
+        if (reply) return jsonResponse({ reply, language, provider: "cloudflare-workers-ai", model: "@cf/meta/llama-3.3-70b-instruct-fp8-fast", fallback: true }, 200, request);
+      } catch (error) {
+        console.error("Cloudflare Workers AI fallback error:", String(error?.message || error).slice(0, 180));
+      }
+    }
+
     return jsonResponse({
       error: geminiQuotaReached
         ? "Gemini API quota or rate limit has been reached. Please try again after the limit resets."
