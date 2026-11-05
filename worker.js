@@ -158,22 +158,14 @@ CRUISE SHIP JOB GUIDANCE AND LIMITED ASSISTANCE
 `;
 
 function corsHeaders(request) {
-  const requestOrigin = new URL(request.url).origin;
-  const origin = request.headers.get("Origin") || "";
-  // Allow the Cloudflare-hosted site itself and this repository's GitHub Pages preview.
-  // Never reflect arbitrary third-party origins.
-  const allowedOrigins = new Set([
-    requestOrigin,
-    "https://siva-global-travels-3d.vercel.app",
-    "https://sivaglobaltravels.vercel.app",
-    "https://siva-multi-services.vercel.app",
-    "https://rakesh8888.github.io"
-  ]);
+  // This is a public, cookie-free chatbot API. A wildcard origin avoids
+  // browser CORS failures when the same frontend is served from a new
+  // Vercel preview/custom domain. Do not add credentialed requests here.
   return {
-    "Access-Control-Allow-Origin": allowedOrigins.has(origin) ? origin : requestOrigin,
+    "Access-Control-Allow-Origin": "*",
     "Access-Control-Allow-Methods": "GET, POST, OPTIONS",
     "Access-Control-Allow-Headers": "Content-Type",
-    "Vary": "Origin"
+    "Access-Control-Max-Age": "86400"
   };
 }
 
