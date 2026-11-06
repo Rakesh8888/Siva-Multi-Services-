@@ -242,7 +242,8 @@ async function handleChat(request, env) {
       .filter(x => x && (x.role === "user" || x.role === "assistant") && typeof x.content === "string")
       .slice(body?.spoken === true ? -2 : -4)
       .map(x => ({ role: x.role, content: x.content.slice(body?.spoken === true ? -500 : -900) })) : [];
-    const ragContext = await retrieveKnowledge(message, env);
+    // Skip vector search on voice turns to reduce latency.
+    const ragContext = body?.spoken === true ? "" : await retrieveKnowledge(message, env);
     const systemPrompt = SYSTEM_PROMPT(language) + ragContext + (body?.spoken === true
       ? "\n\nVOICE RESPONSE SPEED: This is a spoken conversation. Answer immediately and briefly in 1–3 short sentences, usually under 45 words. Put the direct answer first. Avoid long lists, headings, markdown symbols, and unnecessary introductions. Ask at most one short follow-up question."
       : "");
@@ -268,7 +269,8 @@ async function handleChat(request, env) {
     let geminiStatus = 0;
     let geminiQuotaReached = false;
     const models = [GEMINI_MODEL, "gemini-3.1-flash-lite"];
-    if (env.GEMINI_API_KEY) for (let index = 0; index < models.length; index++) {
+    // Use Groq first for spoken turns when configured, avoiding slow Gemini retries.
+    if (env.GEMINI_API_KEY && !(body?.spoken === true && env.GROQ_API_KEY)) for (let index = 0; index < models.length; index++) {
       const model = models[index];
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), body?.spoken === true ? 12000 : 20000);
