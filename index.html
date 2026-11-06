@@ -1934,7 +1934,7 @@ async function startRecognition(mode){
     };
     recorder.start();
     setVoiceStatus(mode==='live'?'వింటున్నాను… మాట్లాడండి.':'వింటున్నాను… మీ సందేశం మాట్లాడి మైక్‌ను మళ్లీ నొక్కండి.');
-    if(mode==='live')voiceRecordTimer=setTimeout(()=>{if(recorder.state==='recording')recorder.stop()},6000);
+    if(mode==='live')voiceRecordTimer=setTimeout(()=>{if(recorder.state==='recording')recorder.stop()},4000);
   }catch(error){
     if(error&&error.name==='NotAllowedError')setVoiceStatus('Microphone permission denied. Chrome Settingsలో Microphoneను Allow చేయండి.');
     else setVoiceStatus('Microphone ప్రారంభం కాలేదు: '+String(error.message||error).slice(0,140));
