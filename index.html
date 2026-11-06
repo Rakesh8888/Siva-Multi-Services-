@@ -1900,6 +1900,7 @@ async function startRecognition(mode){
     recorder.onstop=async()=>{
       stream.getTracks().forEach(t=>t.stop());
       if(voiceRecognition===recorder)voiceRecognition=null;
+      if(voiceRecordTimer){clearTimeout(voiceRecordTimer);voiceRecordTimer=null}
       if(mode==='message')$('voiceMsgBtn').classList.remove('active');
       if(mode==='live'&&!liveVoice)return;
       const blob=new Blob(chunks,{type:recorder.mimeType||'audio/webm'});
@@ -1941,7 +1942,7 @@ async function startRecognition(mode){
     if(mode==='message')$('voiceMsgBtn').classList.remove('active');
   }
 }
-function stopLiveVoice(){liveVoice=false;liveVoiceBusy=false;if(voiceRecognition){try{voiceRecognition.onend=null;voiceRecognition.stop()}catch(e){}voiceRecognition=null}if('speechSynthesis'in window)window.speechSynthesis.cancel();$('liveVoiceBtn').classList.remove('active');$('liveVoiceBtn').setAttribute('aria-label','Start live voice');$('liveVoiceBtn').setAttribute('title','Start live voice');$('liveVoiceBtn').setAttribute('aria-pressed','false');setVoiceStatus('Live voice conversation stopped.')}
+function stopLiveVoice(){liveVoice=false;liveVoiceBusy=false;if(voiceRecordTimer){clearTimeout(voiceRecordTimer);voiceRecordTimer=null}if(voiceRecognition){try{voiceRecognition.onend=null;voiceRecognition.stop()}catch(e){}voiceRecognition=null}if('speechSynthesis'in window)window.speechSynthesis.cancel();$('liveVoiceBtn').classList.remove('active');$('liveVoiceBtn').setAttribute('aria-label','Start live voice');$('liveVoiceBtn').setAttribute('title','Start live voice');$('liveVoiceBtn').setAttribute('aria-pressed','false');setVoiceStatus('Live voice conversation stopped.')}
 // Connect the visible voice controls to the browser speech APIs.
 function stopVoiceMessage(){
   if(voiceRecognition && recognitionMode==='message'){
@@ -1958,11 +1959,7 @@ $('voiceMsgBtn').addEventListener('click',()=>{
     stopVoiceMessage();
     return;
   }
-  if(!SpeechRecognition){
-    setVoiceStatus('Voice input is not supported in this browser. Open this website in Google Chrome and allow microphone access.');
-    return;
-  }
-  if(liveVoice) stopLiveVoice();
+   if(liveVoice) stopLiveVoice();
   $('voiceMsgBtn').classList.add('active');
   setVoiceStatus('Requesting microphone access…');
   startRecognition('message');
@@ -1972,11 +1969,7 @@ $('liveVoiceBtn').addEventListener('click',()=>{
     stopLiveVoice();
     return;
   }
-  if(!SpeechRecognition){
-    setVoiceStatus('Live voice is not supported in this browser. Open this website in Google Chrome and allow microphone access.');
-    return;
-  }
-  stopVoiceMessage();
+   stopVoiceMessage();
   liveVoice=true;
   liveVoiceBusy=false;
   $('liveVoiceBtn').classList.add('active');
