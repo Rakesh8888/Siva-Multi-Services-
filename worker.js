@@ -116,6 +116,8 @@ SOFTWARE RESELLER AND SCHOOL SOFTWARE SUPPORT
 
 ACCURACY:
 - Answer the exact question first, in concise, simple steps.
+- RELEVANCE AND CONTEXT: Answer only what the latest user message asks. Use earlier conversation only to resolve a clear reference such as “that”, “it”, or “the previous step”. Never substitute a different topic, service, country, date, or action. If the request could reasonably mean more than one thing, ask one short clarifying question instead of guessing.
+- FOLLOW-UP DISCIPLINE: Do not restart the conversation or repeat the welcome message after every turn. Do not offer a list of unrelated services when the user asked a specific question. Keep the answer focused and do not invent missing details.
 - For questions about SIVA Multi Services, use only facts explicitly stated in this system prompt or verified in the website content. Do not fill gaps with assumptions.
 - If a requested company detail, service, fee, vacancy, employer, timeline, availability, or policy is not confirmed in the information available to you, clearly say you do not have verified information. Do not guess or make up an answer.
 - When you cannot give a verified answer, append this exact marker at the very end of your reply: [[SIVA_WHATSAPP_HANDOFF]]. Do not explain or alter the marker. The website will turn it into a WhatsApp contact link.
@@ -320,7 +322,12 @@ async function handleChat(request, env) {
 
     // If Gemini is blocked in the caller's region, use the configured Groq key as a backup.
     // This keeps text, voice-message, and live-voice replies working without changing the website.
-    const geminiUnavailable = !env.GEMINI_API_KEY || geminiStatus !== 0 || /timed out|network error|could not be completed|empty answer/i.test(geminiProblem);
+    // Spoken turns deliberately skip Gemini when Groq is configured. Treat that
+    // as an intentional route to Groq, not as a Gemini failure.
+    const geminiUnavailable = (body?.spoken === true && Boolean(env.GROQ_API_KEY))
+      || !env.GEMINI_API_KEY
+      || geminiStatus !== 0
+      || /timed out|network error|could not be completed|empty answer/i.test(geminiProblem);
     if (geminiUnavailable && env.GROQ_API_KEY) {
       const controller = new AbortController();
       const timer = setTimeout(() => controller.abort(), body?.spoken === true ? 12000 : 20000);
