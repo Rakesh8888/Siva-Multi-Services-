@@ -1870,8 +1870,8 @@ Details: ${$('message').value||'Not specified'}`;
 });
 $('themeBtn').addEventListener('click',()=>{document.body.classList.toggle('light');$('themeBtn').textContent=document.body.classList.contains('light')?'☾':'☼'});$('menuBtn').addEventListener('click',()=>{$('navLinks').classList.toggle('mobileNav');$('navLinks').classList.toggle('show')});document.querySelectorAll('#navLinks a').forEach(a=>a.addEventListener('click',()=>$('navLinks').classList.remove('show')));
 const chatLanguageNames={auto:'Auto Detect',en:'English',te:'Telugu',hi:'Hindi',ta:'Tamil',kn:'Kannada',ml:'Malayalam',ur:'Urdu',ar:'Arabic',fr:'French',de:'German',es:'Spanish',pt:'Portuguese',ru:'Russian','zh-CN':'Chinese (Simplified)',ja:'Japanese',ko:'Korean',id:'Indonesian',bn:'Bengali',mr:'Marathi',pa:'Punjabi'};
-function pageSelectedLanguage(){const match=document.cookie.match(/(?:^|;\\s*)googtrans=([^;]+)/);if(!match)return '';try{const parts=decodeURIComponent(match[1]).split('/');return parts.length>2?parts[2]:''}catch{return ''}}
-let manualChatVoiceLanguage=true;function syncSIVALanguageFromWebsite(){if(manualChatVoiceLanguage)return;const target=pageSelectedLanguage();if(!target)return;const next=Object.keys(chatLanguageNames).find(code=>code.toLowerCase()===target.toLowerCase());if(next&&lang!==next){lang=next;setSIVAWelcomeLanguage();const selector=$('chatLanguage');if(selector&&['en','ur','ar','bn'].includes(next))selector.value=next}}
+function pageSelectedLanguage(){const match=document.cookie.match(/(?:^|;\s*)googtrans=([^;]+)/);if(!match)return '';try{const parts=decodeURIComponent(match[1]).split('/');return parts.length>2?parts[2]:''}catch{return ''}}
+let manualChatVoiceLanguage=false;function syncSIVALanguageFromWebsite(){if(manualChatVoiceLanguage)return;const target=pageSelectedLanguage();if(!target)return;const next=Object.keys(chatLanguageNames).find(code=>code.toLowerCase()===target.toLowerCase());if(next&&lang!==next){lang=next;setSIVAWelcomeLanguage();const selector=$('chatLanguage');if(selector&&['en','ur','ar','bn'].includes(next))selector.value=next}}
 function setSIVAWelcomeLanguage(){const welcome=$('chat').querySelector('.msg.bot');if(!welcome)return;const greetings={auto:"Hello Shiva! I am Siva AI. How can I help you today?",en:"Hello Shiva! I am Siva AI. How can I help you with flights, visas, tours or job enquiries?",te:"నమస్కారం శివ గారు! నేను Siva AI. మీకు విమానాలు, వీసాలు, టూర్లు లేదా ఉద్యోగాల విషయంలో ఎలా సహాయం చేయగలను?",hi:"नमस्ते शिव जी! मैं Siva AI हूँ। मैं आपकी किस प्रकार सहायता कर सकता हूँ?",ta:"வணக்கம் சிவா அவர்களே! நான் Siva AI. விமானங்கள், விசா, சுற்றுலா அல்லது வேலை தொடர்பாக எப்படி உதவலாம்?",kn:"ನಮಸ್ಕಾರ ಶಿವ ಅವರೇ! ನಾನು Siva AI. ವಿಮಾನ, ವೀಸಾ, ಪ್ರವಾಸ ಅಥವಾ ಉದ್ಯೋಗಗಳ ಬಗ್ಗೆ ಹೇಗೆ ಸಹಾಯ ಮಾಡಲಿ?",ml:"നമസ്കാരം ശിവാ! ഞാൻ Siva AI. വിമാനങ്ങൾ, വിസ, യാത്രകൾ അല്ലെങ്കിൽ ജോലികൾ സംബന്ധിച്ച് എങ്ങനെ സഹായിക്കാം?",ur:"السلام علیکم شیوا صاحب! میں Siva AI ہوں۔ میں آپ کی کس طرح مدد کر سکتا ہوں؟",ar:"مرحباً شيفا! أنا Siva AI. كيف يمكنني مساعدتك في الطيران أو التأشيرات أو الرحلات أو الوظائف؟",fr:"Bonjour Shiva ! Je suis Siva AI. Comment puis-je vous aider ?",de:"Hallo Shiva! Ich bin Siva AI. Wie kann ich Ihnen helfen?",es:"¡Hola, Shiva! Soy Siva AI. ¿Cómo puedo ayudarte?",pt:"Olá, Shiva! Sou a Siva AI. Como posso ajudar?",ru:"Здравствуйте, Шива! Я Siva AI. Чем могу помочь?","zh-CN":"您好，Shiva！我是 Siva AI。有什么可以帮您？",ja:"こんにちは、Shivaさん。Siva AIです。どのようにお手伝いできますか？",ko:"안녕하세요, Shiva님! Siva AI입니다. 무엇을 도와드릴까요?",id:"Halo Shiva! Saya Siva AI. Ada yang bisa saya bantu?",bn:"নমস্কার শিব! আমি Siva AI। কীভাবে সাহায্য করতে পারি?",mr:"नमस्कार शिवजी! मी Siva AI आहे. मी आपली कशी मदत करू?",pa:"ਸਤ ਸ੍ਰੀ ਅਕਾਲ ਸ਼ਿਵ ਜੀ! ਮੈਂ Siva AI ਹਾਂ। ਮੈਂ ਤੁਹਾਡੀ ਕਿਵੇਂ ਮਦਦ ਕਰ ਸਕਦਾ ਹਾਂ?"};welcome.textContent=greetings[lang]||greetings.en;}
 syncSIVALanguageFromWebsite();
 const chatVoiceSelector=$('chatLanguage');if(chatVoiceSelector){chatVoiceSelector.value='te';chatVoiceSelector.style.setProperty('display','block','important');chatVoiceSelector.style.setProperty('width','auto','important');chatVoiceSelector.style.setProperty('min-width','92px','important');chatVoiceSelector.style.setProperty('max-width','120px','important');chatVoiceSelector.style.setProperty('font-size','12px','important');chatVoiceSelector.addEventListener('change',()=>{manualChatVoiceLanguage=true;lang=chatVoiceSelector.value;setSIVAWelcomeLanguage();setVoiceStatus('Siva AI language: '+(chatLanguageNames[lang]||'Telugu')+'. AI replies and voice input will use this language.')})}setSIVAWelcomeLanguage();
@@ -2646,6 +2646,87 @@ html body{perspective:none!important}
   #contact .detail.office-map-card{min-height:190px!important}
 }
 </style>
+
+
+<!-- SIVA AI mobile layout, language and voice reliability hotfix -->
+<style id="siva-ai-mobile-layout-hotfix">
+#aiPanel.open{
+  position:fixed!important;right:12px!important;bottom:max(12px,env(safe-area-inset-bottom))!important;
+  top:auto!important;width:min(460px,calc(100vw - 24px))!important;
+  height:min(760px,calc(100dvh - 24px))!important;max-height:calc(100dvh - 24px)!important;
+  display:flex!important;flex-direction:column!important;overflow:hidden!important;
+}
+#aiPanel .aiHeader{flex:0 0 auto!important}
+#aiPanel .aiBody{
+  display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+  min-height:0!important;overflow:hidden!important;padding:10px!important;
+}
+#aiPanel #chat{
+  flex:1 1 auto!important;min-height:0!important;height:auto!important;
+  max-height:none!important;overflow-y:auto!important;overscroll-behavior:contain!important;
+  -webkit-overflow-scrolling:touch!important;scrollbar-gutter:stable;
+}
+#aiPanel #chatForm,#aiPanel .chatComposer{
+  position:relative!important;inset:auto!important;flex:0 0 auto!important;
+  display:flex!important;align-items:center!important;margin:8px 0 0!important;
+  z-index:2!important;background:var(--panel)!important;
+}
+#aiPanel #chatText{flex:1 1 0!important;min-width:0!important}
+#aiPanel #voiceStatus{flex:0 0 auto!important;margin:6px 2px 0!important}
+#aiPanel .msg{max-width:100%!important;overflow-wrap:anywhere!important;word-break:normal!important}
+@media(max-width:520px){
+  #aiPanel.open{
+    left:8px!important;right:8px!important;top:max(8px,env(safe-area-inset-top))!important;
+    bottom:max(8px,env(safe-area-inset-bottom))!important;width:auto!important;
+    height:auto!important;max-height:none!important;border-radius:20px!important;
+  }
+  #aiPanel .aiHeader{min-height:64px!important;padding:10px 12px!important}
+  #aiPanel .aiBody{padding:8px!important}
+  #aiPanel #chatForm,#aiPanel .chatComposer{gap:5px!important}
+  #aiPanel .chatComposer button{flex:0 0 auto!important}
+}
+</style>
+<script id="siva-ai-language-and-voice-hotfix">
+(function(){
+  function applyWebsiteLanguage(){
+    var selector=document.getElementById('chatLanguage');
+    if(!selector)return;
+    var match=document.cookie.match(/(?:^|;\\s*)googtrans=([^;]+)/);
+    if(!match)return;
+    var parts;
+    try{parts=decodeURIComponent(match[1]).split('/')}catch(e){return}
+    var target=parts.length>2?parts[2]:'';
+    var allowed=['en','te','hi','ta','kn','ml','ur','ar','bn'];
+    if(!allowed.includes(target))return;
+    if(typeof manualChatVoiceLanguage!=='undefined'&&!manualChatVoiceLanguage){
+      lang=target;selector.value=target;
+      if(typeof setSIVAWelcomeLanguage==='function')setSIVAWelcomeLanguage();
+    }
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',applyWebsiteLanguage);
+  else applyWebsiteLanguage();
+  var selector=document.getElementById('chatLanguage');
+  if(selector){
+    selector.addEventListener('change',function(){
+      if(typeof manualChatVoiceLanguage!=='undefined')manualChatVoiceLanguage=true;
+      if(typeof lang!=='undefined')lang=selector.value;
+      if(typeof setSIVAWelcomeLanguage==='function')setSIVAWelcomeLanguage();
+    });
+  }
+  var panel=document.getElementById('aiPanel');
+  if(panel){
+    panel.addEventListener('click',function(e){
+      var mic=e.target.closest('#voiceMsgBtn,#liveVoiceBtn');
+      if(!mic)return;
+      if(!window.isSecureContext){
+        setTimeout(function(){
+          if(typeof setVoiceStatus==='function')setVoiceStatus('Microphone requires a secure HTTPS page. Open the website using its https:// address.');
+        },0);
+      }
+    });
+  }
+})();
+</script>
 
 </body>
 </html>
