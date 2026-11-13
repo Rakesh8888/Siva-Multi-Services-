@@ -1936,15 +1936,23 @@ function startNativeSpeech(mode){
         processChat(finalTranscript.trim(),true,true);
       }
     };
+    let useRecorderFallback=false;
     recognition.onerror=e=>{
-      if(e.error==='not-allowed'||e.error==='service-not-allowed')setVoiceStatus('మైక్రోఫోన్ అనుమతి ఇవ్వండి: Chrome Settings → Site settings → Microphone → Allow.');
-      else if(e.error==='no-speech')setVoiceStatus('మీ మాటలు వినిపించలేదు. మళ్లీ మాట్లాడండి.');
-      else if(e.error==='network')setVoiceStatus('వాయిస్ గుర్తింపుకు నెట్‌వర్క్ సమస్య వచ్చింది. Internet తనిఖీ చేయండి.');
-      else setVoiceStatus('వాయిస్ గుర్తింపు సమస్య: '+e.error);
-      if(mode==='live'&&(e.error==='not-allowed'||e.error==='service-not-allowed'))stopLiveVoice();
+      const fallbackErrors=['not-allowed','service-not-allowed','network','audio-capture','aborted'];
+      if(fallbackErrors.includes(e.error)&&navigator.mediaDevices?.getUserMedia&&window.MediaRecorder){
+        useRecorderFallback=true;
+        if(nativeSpeechRecognition===recognition)nativeSpeechRecognition=null;
+        setVoiceStatus('Speech recognition అందుబాటులో లేదు. Microphone recorder ద్వారా ప్రయత్నిస్తున్నాను…');
+        try{recognition.stop()}catch(_){}
+        setTimeout(()=>{if(mode!=='live'||liveVoice)startRecognition(mode,true)},250);
+        return;
+      }
+      if(e.error==='no-speech')setVoiceStatus('మీ మాటలు వినిపించలేదు. మళ్లీ మాట్లాడండి.');
+      else setVoiceStatus('వాయిస్ గుర్తింపు సమస్య: '+e.error+'. Chromeలో Microphone అనుమతిని తనిఖీ చేయండి.');
     };
     recognition.onend=()=>{
       if(nativeSpeechRecognition===recognition)nativeSpeechRecognition=null;
+      if(useRecorderFallback)return;
       if(mode==='message'){
         $('voiceMsgBtn').classList.remove('active');
         const transcript=finalTranscript.trim();
@@ -1955,7 +1963,7 @@ function startNativeSpeech(mode){
           $('chatText').value='';
         }else if(!submitted)setVoiceStatus('మాటలు గుర్తించబడలేదు. మళ్లీ మైక్ నొక్కి ప్రయత్నించండి.');
       }else if(mode==='live'&&liveVoice&&!liveVoiceBusy&&!submitted){
-        setTimeout(()=>{if(liveVoice&&!liveVoiceBusy)startRecognition('live')},500);
+        setTimeout(()=>{if(liveVoice&&!liveVoiceBusy)startRecognition('live')},700);
       }
     };
     recognition.start();
@@ -1966,9 +1974,9 @@ function startNativeSpeech(mode){
     return false;
   }
 }
-async function startRecognition(mode){
+async function startRecognition(mode,forceRecorder=false){
   recognitionMode=mode;
-  if(SpeechRecognition&&startNativeSpeech(mode))return;
+  if(!forceRecorder&&SpeechRecognition&&startNativeSpeech(mode))return;
   if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){
     setVoiceStatus('ఈ బ్రౌజర్‌లో వాయిస్ గుర్తింపు అందుబాటులో లేదు. Android Chromeలో HTTPS వెబ్‌సైట్ తెరిచి Microphone అనుమతి ఇవ్వండి.');
     return;
@@ -2017,8 +2025,8 @@ async function startRecognition(mode){
       }
     };
     recorder.start();
-    setVoiceStatus(mode==='live'?'వింటున్నాను… మాట్లాడండి.':'వింటున్నాను… మాట్లాడి మైక్‌ను మళ్లీ నొక్కండి.');
-    if(mode==='live')voiceRecordTimer=setTimeout(()=>{if(recorder.state==='recording')recorder.stop()},4000);
+    setVoiceStatus(mode==='live'?'వింటున్నాను… మాట్లాడండి.':'రికార్డింగ్ ప్రారంభమైంది. మాట్లాడిన తర్వాత మైక్‌ను మళ్లీ నొక్కి పంపండి.');
+    if(mode==='live')voiceRecordTimer=setTimeout(()=>{if(recorder.state==='recording')recorder.stop()},6000);
   }catch(error){
     if(error&&error.name==='NotAllowedError')setVoiceStatus('మైక్రోఫోన్ అనుమతి నిరాకరించబడింది. Chrome Settingsలో Microphoneను Allow చేయండి.');
     else setVoiceStatus('మైక్రోఫోన్ ప్రారంభం కాలేదు: '+String(error.message||error).slice(0,140));
@@ -2044,7 +2052,10 @@ $('voiceMsgBtn').addEventListener('click',()=>{
   if(liveVoice)stopLiveVoice();
   $('voiceMsgBtn').classList.add('active');
   setVoiceStatus('మైక్రోఫోన్ అనుమతి అడుగుతున్నాను…');
-  startRecognition('message');
+  startRecognition('message').catch(error=>{
+    $('voiceMsgBtn').classList.remove('active');
+    setVoiceStatus('మైక్రోఫోన్ ప్రారంభం కాలేదు: '+String(error.message||error));
+  });
 });
 $('liveVoiceBtn').addEventListener('click',()=>{
   if(liveVoice){stopLiveVoice();return}
