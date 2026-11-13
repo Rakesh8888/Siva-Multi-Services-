@@ -2844,5 +2844,41 @@ html body{perspective:none!important}
 @media(prefers-reduced-motion:reduce){#siva-3d-showcase *,#siva-3d-showcase *:before,#siva-3d-showcase *:after{animation:none!important;transition:none!important}#siva-3d-showcase .siva3d-card:hover{transform:none}}
 </style>
 
+
+<!-- SIVA AI compact-size override: smaller launcher and less intrusive chat window -->
+<style id="siva-ai-compact-size-final">
+  #aiFab.aiFab{
+    width:46px!important;height:46px!important;min-width:46px!important;min-height:46px!important;
+    max-width:46px!important;max-height:46px!important;flex:0 0 46px!important;
+    font-size:0!important;border-radius:50%!important;
+  }
+  #aiFab.aiFab::after{font-size:12px!important;letter-spacing:.2px!important}
+  #aiPanel{
+    width:min(420px,calc(100vw - 32px))!important;
+    height:min(560px,72dvh)!important;
+    max-height:calc(100dvh - 120px)!important;
+    border-radius:18px!important;
+  }
+  #aiPanel .aiHeader{padding:10px 12px!important;min-height:54px!important}
+  #aiPanel .aiBody{padding:10px!important}
+  #aiPanel .chat{min-height:120px!important}
+  @media(max-width:600px){
+    #aiFab.aiFab{
+      width:44px!important;height:44px!important;min-width:44px!important;min-height:44px!important;
+      max-width:44px!important;max-height:44px!important;flex-basis:44px!important;
+    }
+    #aiPanel{
+      width:calc(100vw - 28px)!important;
+      max-width:390px!important;
+      height:min(520px,70dvh)!important;
+      max-height:calc(100dvh - 112px)!important;
+      border-radius:16px!important;
+    }
+    #aiPanel .aiHeader{padding:9px 10px!important}
+    #aiPanel .aiBody{padding:9px!important}
+    #aiPanel .chat{min-height:110px!important}
+  }
+</style>
+
 </body>
 </html>
