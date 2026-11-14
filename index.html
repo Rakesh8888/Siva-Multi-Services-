@@ -1677,6 +1677,31 @@ html body .aiPanel#aiPanel .chatComposer #liveVoiceBtn .voiceWaveIcon{
 </style>
 
 <script defer src="https://cloud.umami.is/script.js" data-website-id="8ca5a499-87df-4558-826a-cf208b60a109"></script>
+
+<style id="siva-ai-compact-chat-final">
+/* Compact SIVA AI popup on phones and desktop. */
+#aiPanel.aiPanel,
+#aiPanel.aiPanel.open{
+  position:fixed!important;top:auto!important;left:auto!important;
+  right:14px!important;bottom:78px!important;
+  width:min(340px,calc(100vw - 28px))!important;
+  height:390px!important;max-height:62dvh!important;min-height:0!important;
+  display:flex!important;flex-direction:column!important;overflow:hidden!important;
+  border-radius:16px!important;
+}
+#aiPanel .aiHeader{flex:0 0 50px!important;height:50px!important;min-height:50px!important;padding:8px 10px!important}
+#aiPanel .aiBody{display:flex!important;flex:1 1 auto!important;flex-direction:column!important;min-height:0!important;overflow:hidden!important;padding:8px!important}
+#aiPanel #chat{height:130px!important;min-height:90px!important;max-height:130px!important;flex:1 1 auto!important;overflow-y:auto!important}
+#aiPanel #chatForm{flex:0 0 auto!important;margin-top:7px!important}
+@media(max-width:520px){
+  #aiPanel.aiPanel,#aiPanel.aiPanel.open{
+    right:10px!important;bottom:72px!important;width: min(310px,calc(100vw - 20px))!important;
+    height:350px!important;max-height:55dvh!important;
+  }
+  #aiPanel .aiHeader{flex-basis:46px!important;height:46px!important;min-height:46px!important}
+  #aiPanel #chat{height:112px!important;min-height:78px!important;max-height:112px!important}
+}
+</style>
 </head>
 <body class="light">
 <div class="topbar"><div class="wrap"><span>📍 Badvel, Andhra Pradesh, India</span><span id="headerDate" aria-label="Current date">28/10/2026(WED)</span></div></div>
@@ -1684,34 +1709,7 @@ html body .aiPanel#aiPanel .chatComposer #liveVoiceBtn .voiceWaveIcon{
 <main>
 <section id="flights"><div class="wrap"><div class="sectionHead"><div class="eyebrow">FLIGHT ENQUIRY</div><h2>Find your next <span>flight.</span></h2><p>Send your flight details to SIVA MULTI SERVICES. Our team will help check available flights, fares and booking options.</p></div><div class="flightShell"><div class="flightTop"><h3>✈ Flight search</h3><span class="demoTag">FLIGHT BOOKING ASSISTANCE</span></div><div class="tripTypes"><button class="active" data-trip="oneway">One way</button><button data-trip="round">Round trip</button></div><form id="flightForm"><div class="fields"><div class="field"><label for="from">From</label><select id="from" required><option value="HYD">Hyderabad (HYD)</option><option value="DEL">Delhi (DEL)</option><option value="MAA">Chennai (MAA)</option><option value="BLR">Bengaluru (BLR)</option><option value="BOM">Mumbai (BOM)</option><option value="VGA">Vijayawada (VGA)</option><option value="TIR">Tirupati (TIR)</option><option value="COK">Kochi (COK)</option></select></div><div class="field"><label for="to">To</label><select id="to" required><option value="KWI">Kuwait (KWI)</option><option value="DXB">Dubai (DXB)</option><option value="DOH">Doha (DOH)</option><option value="MCT">Muscat (MCT)</option><option value="LHR">London (LHR)</option><option value="FRA">Frankfurt (FRA)</option><option value="FCO">Rome (FCO)</option><option value="NRT">Tokyo (NRT)</option><option value="SIN">Singapore (SIN)</option><option value="KUL">Kuala Lumpur (KUL)</option></select></div><div class="field"><label for="depart">Departure date</label><input type="date" id="depart" required></div><div class="field" id="returnField"><label for="return">Return date</label><input type="date" id="return"></div><div class="field"><label for="adults">Adults</label><select id="adults"><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option><option>8</option><option>9</option></select></div><div class="field"><label for="cabin">Cabin class</label><select id="cabin"><option>Economy</option><option>Premium Economy</option><option>Business</option><option>First</option></select></div></div><div class="flightActions"><button class="btn primary" type="submit">Send flight enquiry →</button><span class="note">To book, send an enquiry to SIVA MULTI SERVICES. Our team will confirm the final fare and availability.</span></div></form><div class="results" id="flightResults" aria-live="polite"></div></div></div></section>
 
-<section id="siva-3d-showcase" aria-labelledby="siva3d-title">
-  <div class="wrap">
-    <div class="sectionHead">
-      <div class="eyebrow">SIVA MULTI SERVICES · 3D EXPERIENCE</div>
-      <h2 id="siva3d-title">One place. <span>Many possibilities.</span></h2>
-      <p>Explore travel, documentation, career guidance and business technology through our interactive 3D service experience.</p>
-    </div>
-    <div class="siva3d-grid">
-      <article class="siva3d-card siva3d-travel">
-        <div class="siva3d-scene" aria-hidden="true"><div class="siva3d-orbit"><span class="siva3d-globe">🌍</span><span class="siva3d-plane">✈️</span></div></div>
-        <div class="siva3d-copy"><span class="siva3d-kicker">01 · EXPLORE</span><h3>Tours &amp; Travels</h3><p>Flight, train, bus, hotel and holiday booking assistance.</p></div>
-      </article>
-      <article class="siva3d-card siva3d-visa">
-        <div class="siva3d-scene" aria-hidden="true"><div class="siva3d-passport"><span>✦</span><b>VISA</b><small>TRAVEL DOCUMENT</small></div><span class="siva3d-stamp">APPROVAL<br>PROCESS</span></div>
-        <div class="siva3d-copy"><span class="siva3d-kicker">02 · PREPARE</span><h3>Visa Assistance</h3><p>Document preparation and application guidance.</p></div>
-      </article>
-      <article class="siva3d-card siva3d-cruise">
-        <div class="siva3d-scene" aria-hidden="true"><div class="siva3d-wave"></div><div class="siva3d-ship">🚢</div><span class="siva3d-spark">✦</span></div>
-        <div class="siva3d-copy"><span class="siva3d-kicker">03 · CAREER</span><h3>Overseas &amp; Cruise Jobs</h3><p>CV preparation, application guidance and interview support.</p></div>
-      </article>
-      <article class="siva3d-card siva3d-tech">
-        <div class="siva3d-scene" aria-hidden="true"><div class="siva3d-chip"><span>AI</span><i>CRM</i><i>ERP</i><i>APP</i></div><span class="siva3d-tech-orbit">✧</span></div>
-        <div class="siva3d-copy"><span class="siva3d-kicker">04 · BUILD</span><h3>Software &amp; Technology</h3><p>CRM, ERP, billing systems, school apps and AI support.</p></div>
-      </article>
-    </div>
-    <p class="siva3d-disclaimer">Job support is guidance only. Visa decisions, bookings and recruitment outcomes are subject to the relevant authorities and authorized providers.</p>
-  </div>
-</section>
+
 
 <section id="services"><div class="wrap"><div class="sectionHead"><div class="eyebrow">OUR SERVICES</div><h2>Everything for your <span>next step.</span></h2><p>Our services are grouped into four simple categories so you can find the support you need.</p></div><div class="grid">
 <article class="card"><div class="flight-card-visual"><img src="https://images.unsplash.com/photo-1683806900937-1695468e808b?auto=format&fit=crop&w=1600&q=85" alt="Passenger airplane flying above snowy mountains and clouds" loading="lazy"></div><h3>Travel & Ticketing</h3><p>Flight enquiries, India tours, Gulf tours, Schengen and Europe tours, and travel planning support.</p><a class="textlink" href="#flights">Explore travel services →</a></article>
@@ -2821,42 +2819,7 @@ html body{perspective:none!important}
 </script>
 
 
-<style id="siva-3d-service-experience">
-#siva-3d-showcase{position:relative;overflow:hidden;background:radial-gradient(ellipse at 15% 15%,rgba(22,111,145,.16),transparent 42%),radial-gradient(ellipse at 90% 85%,rgba(201,167,125,.12),transparent 38%)}
-#siva-3d-showcase .siva3d-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;perspective:1200px}
-#siva-3d-showcase .siva3d-card{position:relative;min-width:0;overflow:hidden;border:1px solid var(--line);border-radius:22px;background:linear-gradient(145deg,var(--panel),var(--panel2));box-shadow:0 20px 42px rgba(0,0,0,.2);transform-style:preserve-3d;transition:transform .35s ease,border-color .35s ease,box-shadow .35s ease}
-#siva-3d-showcase .siva3d-card:hover{transform:translateY(-9px) rotateY(-4deg) rotateX(3deg);border-color:var(--orange);box-shadow:0 28px 54px rgba(0,0,0,.28)}
-#siva-3d-showcase .siva3d-scene{height:190px;position:relative;display:grid;place-items:center;overflow:hidden;background:radial-gradient(circle at 50% 45%,rgba(37,160,195,.22),transparent 65%),linear-gradient(145deg,#0c2436,#101820)}
-#siva-3d-showcase .siva3d-copy{padding:18px}
-#siva-3d-showcase .siva3d-kicker{font-size:10px;letter-spacing:.16em;font-weight:800;color:var(--orange)}
-#siva-3d-showcase .siva3d-copy h3{font-size:19px;margin:8px 0}
-#siva-3d-showcase .siva3d-copy p{font-size:13px;line-height:1.5;color:var(--muted);margin:0}
-#siva-3d-showcase .siva3d-orbit{width:132px;height:132px;border:1px solid #70d8ff8a;border-radius:50%;display:grid;place-items:center;position:relative;box-shadow:0 0 38px #20b9f42b,inset -15px -15px 35px #0008;animation:siva3d-float 5s ease-in-out infinite}
-#siva-3d-showcase .siva3d-orbit:before,#siva-3d-showcase .siva3d-orbit:after{content:"";position:absolute;inset:-12px;border:1px solid #70d8ff5c;border-radius:50%;transform:rotateX(68deg)}
-#siva-3d-showcase .siva3d-orbit:after{transform:rotateY(68deg)}
-#siva-3d-showcase .siva3d-globe{font-size:70px;filter:drop-shadow(0 10px 10px #0009);animation:siva3d-spin 18s linear infinite}
-#siva-3d-showcase .siva3d-plane{position:absolute;font-size:30px;right:-12px;top:10px;filter:drop-shadow(0 5px 6px #0009);animation:siva3d-fly 6s ease-in-out infinite}
-#siva-3d-showcase .siva3d-passport{width:105px;height:140px;border-radius:9px;background:linear-gradient(145deg,#b88b4d,#614522);border:2px solid #e7c98c;box-shadow:12px 16px 20px #0008;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;transform:rotateY(-18deg) rotateX(8deg);animation:siva3d-float 4.5s ease-in-out infinite;color:#fff0ce}
-#siva-3d-showcase .siva3d-passport span{font-size:27px}#siva-3d-showcase .siva3d-passport b{font-size:19px;letter-spacing:.13em}#siva-3d-showcase .siva3d-passport small{font-size:6px;letter-spacing:.12em}
-#siva-3d-showcase .siva3d-stamp{position:absolute;right:8%;bottom:18%;border:2px solid #e7b66c;color:#e7b66c;border-radius:50%;padding:10px 6px;font-size:8px;line-height:1.2;text-align:center;transform:rotate(-18deg);animation:siva3d-pulse 3s ease-in-out infinite}
-#siva-3d-showcase .siva3d-wave{position:absolute;width:160%;height:70px;bottom:15px;left:-30%;border-radius:50%;background:linear-gradient(180deg,#2ba4c8aa,#0b567b);box-shadow:0 -12px 24px #38c4ed22;transform:rotate(-8deg);animation:siva3d-wave 5s ease-in-out infinite}
-#siva-3d-showcase .siva3d-ship{z-index:1;font-size:82px;filter:drop-shadow(0 14px 10px #0009);animation:siva3d-sail 5s ease-in-out infinite}
-#siva-3d-showcase .siva3d-spark{position:absolute;top:25px;right:24%;font-size:24px;color:#ffe0a1;animation:siva3d-pulse 2s ease-in-out infinite}
-#siva-3d-showcase .siva3d-chip{width:145px;height:112px;border:1px solid #76d8f4;border-radius:14px;background:linear-gradient(145deg,#174a64,#0c2537);box-shadow:12px 16px 25px #0008;display:grid;grid-template-columns:1fr 1fr;place-items:center;transform:rotateX(14deg) rotateY(-15deg);animation:siva3d-float 5s ease-in-out infinite}
-#siva-3d-showcase .siva3d-chip span{grid-column:1/-1;font-size:32px;font-weight:800;color:#a9edff;text-shadow:0 0 18px #47cfff}
-#siva-3d-showcase .siva3d-chip i{font-size:12px;font-style:normal;color:#d4eefa;border:1px solid #65bcd5;border-radius:6px;padding:4px 10px}
-#siva-3d-showcase .siva3d-tech-orbit{position:absolute;right:18%;top:16%;font-size:26px;color:#e9c58e;animation:siva3d-spin 8s linear infinite}
-#siva-3d-showcase .siva3d-disclaimer{font-size:11px;color:var(--muted);margin:18px 0 0}
-@keyframes siva3d-float{0%,100%{translate:0 0}50%{translate:0 -12px}}
-@keyframes siva3d-spin{to{transform:rotate(360deg)}}
-@keyframes siva3d-fly{0%,100%{translate:0 0;rotate:-12deg}50%{translate:-18px 12px;rotate:8deg}}
-@keyframes siva3d-pulse{0%,100%{opacity:.65;scale:.92}50%{opacity:1;scale:1.08}}
-@keyframes siva3d-sail{0%,100%{translate:0 3px;rotate:-2deg}50%{translate:0 -9px;rotate:2deg}}
-@keyframes siva3d-wave{0%,100%{translate:0 0}50%{translate:14px -7px}}
-@media(max-width:900px){#siva-3d-showcase .siva3d-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
-@media(max-width:520px){#siva-3d-showcase .siva3d-grid{gap:10px}#siva-3d-showcase .siva3d-scene{height:145px}#siva-3d-showcase .siva3d-copy{padding:13px}#siva-3d-showcase .siva3d-copy h3{font-size:16px}#siva-3d-showcase .siva3d-copy p{font-size:12px}#siva-3d-showcase .siva3d-orbit{scale:.82}#siva-3d-showcase .siva3d-passport{scale:.82}#siva-3d-showcase .siva3d-ship{font-size:65px}}
-@media(prefers-reduced-motion:reduce){#siva-3d-showcase *,#siva-3d-showcase *:before,#siva-3d-showcase *:after{animation:none!important;transition:none!important}#siva-3d-showcase .siva3d-card:hover{transform:none}}
-</style>
+
 
 
 <!-- SIVA AI compact-size override: smaller launcher and less intrusive chat window -->
