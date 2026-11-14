@@ -1867,6 +1867,14 @@ html body .aiPanel#aiPanel .chatComposer #liveVoiceBtn .voiceWaveIcon{
   </div>
   <div class="aiBody">
     <div class="chat" id="chat" aria-live="polite"><div class="msg bot">Hello Shiva! I am Siva AI. How can I help you today?</div></div>
+    <div id="sivaQuickReplies" class="sivaQuickReplies" aria-label="Quick questions">
+      <button type="button" data-message="Flight booking">✈️ Flight Booking</button>
+      <button type="button" data-message="Visa assistance">🛂 Visa Assistance</button>
+      <button type="button" data-message="Tourism and holiday packages">🌍 Tours &amp; Tourism</button>
+      <button type="button" data-message="Cruise jobs assistance">🚢 Cruise Jobs</button>
+      <button type="button" data-message="Overseas jobs assistance">💼 Overseas Jobs</button>
+      <button type="button" data-message="Contact Siva Multi Services">☎️ Contact Us</button>
+    </div>
     <form class="chatInput chatComposer" id="chatForm">
       <button type="button" class="composerIcon" id="chatPlus" aria-label="Show quick actions" title="Quick actions">＋</button>
       <input id="chatText" placeholder="Message Siva AI" autocomplete="off" aria-label="Message Siva AI">
@@ -3121,6 +3129,38 @@ html body #aiPanel .aiHeader button,html body #aiPanel .aiHeader select{touch-ac
  }
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',setup,{once:true});else setup();
  window.addEventListener('pageshow',setup);
+})();
+</script>
+
+<style id="siva-quick-replies-style">
+#sivaQuickReplies{display:flex!important;flex-wrap:wrap!important;gap:6px!important;padding:7px 8px!important;max-height:92px!important;overflow-y:auto!important;flex:0 0 auto!important}
+#sivaQuickReplies button{border:1px solid #527286!important;background:#102b3e!important;color:#f4f8fb!important;border-radius:16px!important;padding:7px 10px!important;min-height:30px!important;font-size:11px!important;line-height:1.25!important;white-space:normal!important;cursor:pointer!important;touch-action:manipulation!important}
+#sivaQuickReplies button:active{background:#1d536e!important;transform:scale(.98)}
+@media(max-width:520px){#sivaQuickReplies{max-height:82px!important;gap:5px!important;padding:5px 6px!important}#sivaQuickReplies button{font-size:10px!important;padding:6px 8px!important;min-height:28px!important}}
+</style>
+<script id="siva-quick-replies-handler">
+(function(){
+ function bind(){
+  const wrap=document.getElementById('sivaQuickReplies');
+  const input=document.getElementById('chatText');
+  if(!wrap||!input||wrap.dataset.bound)return;
+  wrap.dataset.bound='1';
+  wrap.addEventListener('click',function(e){
+   const button=e.target.closest('button[data-message]');
+   if(!button)return;
+   const message=button.getAttribute('data-message')||'';
+   if(!message)return;
+   input.value=message;
+   if(typeof processChat==='function'){
+    processChat(message);
+    input.value='';
+   }else{
+    const form=document.getElementById('chatForm');
+    if(form)form.requestSubmit();
+   }
+  });
+ }
+ if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
 })();
 </script>
 </body>
