@@ -2894,8 +2894,8 @@ html body{perspective:none!important}
 
 <!-- Final SIVA AI card sizing override: intentionally compact on desktop and mobile -->
 <style id="siva-ai-card-size-final">
-  #aiPanel,
-  #aiPanel.open{
+  .aiPanel,
+  .aiPanel.open{
     position:fixed!important;
     width:360px!important;
     max-width:calc(100vw - 32px)!important;
@@ -2907,12 +2907,12 @@ html body{perspective:none!important}
     overflow:hidden!important;
     border-radius:16px!important;
   }
-  #aiPanel .aiHeader{flex:0 0 auto!important;min-height:48px!important;padding:8px 10px!important}
-  #aiPanel .aiBody{min-height:0!important;padding:8px!important}
-  #aiPanel #chat{min-height:0!important;flex:1 1 auto!important}
+  .aiPanel .aiHeader{flex:0 0 auto!important;min-height:48px!important;padding:8px 10px!important}
+  .aiPanel .aiBody{min-height:0!important;padding:8px!important}
+  .aiPanel .chat{min-height:0!important;flex:1 1 auto!important}
   @media(max-width:520px){
-    #aiPanel,
-    #aiPanel.open{
+    .aiPanel,
+    .aiPanel.open{
       width: min(320px, calc(100vw - 28px))!important;
       max-width:320px!important;
       height: min(410px, calc(100dvh - 130px))!important;
@@ -2921,8 +2921,8 @@ html body{perspective:none!important}
       right:12px!important;bottom:76px!important;
       border-radius:15px!important;
     }
-    #aiPanel .aiHeader{min-height:44px!important;padding:7px 9px!important}
-    #aiPanel .aiBody{padding:7px!important}
+    .aiPanel .aiHeader{min-height:44px!important;padding:7px 9px!important}
+    .aiPanel .aiBody{padding:7px!important}
   }
 </style>
 
