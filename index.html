@@ -3103,6 +3103,7 @@ html body #aiPanel .aiHeader button,html body #aiPanel .aiHeader select{touch-ac
     e.preventDefault();e.stopImmediatePropagation();delete fab.dataset.dragJustHappened;return;
    }
    e.preventDefault();
+   e.stopImmediatePropagation();
    if(panel.classList.contains('open')){
     if(typeof stopLiveVoice==='function'){try{stopLiveVoice()}catch(_){}}
     panel.classList.remove('open');panel.setAttribute('aria-hidden','true');
