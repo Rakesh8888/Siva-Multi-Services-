@@ -2601,4 +2601,16 @@ footer{background:#e7f5fc !important;color:#5f7888 !important}
 }
 
 /* Floating button label: LUCKY → SIVA */
-.ai-chat-toggle::before{content:"SIVA"!important}
+.ai-chat-toggle::before{content:"SIVA"!important}/* చిన్న chatbot ప్యానెల్ */
+.ai-chat-panel {
+  width: min(330px, calc(100vw - 32px)) !important;
+  height: 440px !important;
+  border-radius: 16px !important;
+}
+
+@media (max-width: 700px) {
+  .ai-chat-panel {
+    width: calc(100vw - 32px) !important;
+    height: min(420px, calc(100dvh - 100px)) !important;
+  }
+}
