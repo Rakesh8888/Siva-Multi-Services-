@@ -103,7 +103,7 @@ create table if not exists public.case_payments (
   created_by uuid references public.customer_profiles(user_id)
 );
 
--- Ledger is append-only for customers. Corrections should be new adjustment/refund entries.
+-- Ledger is append-only for everyone. Corrections must be new adjustment/refund entries.
 create or replace function public.check_payment_case_owner()
 returns trigger
 language plpgsql
@@ -264,12 +264,6 @@ create policy "payments admin insert" on public.case_payments
 for insert to authenticated
 with check (public.is_siva_admin());
 
-drop policy if exists "payments admin update" on public.case_payments;
-create policy "payments admin update" on public.case_payments
-for update to authenticated
-using (public.is_siva_admin())
-with check (public.is_siva_admin());
-
 drop policy if exists "documents read own or admin" on public.case_documents;
 create policy "documents read own or admin" on public.case_documents
 for select to authenticated
@@ -306,7 +300,7 @@ grant update (full_name, phone) on public.customer_profiles to authenticated;
 
 grant select on public.service_cases, public.case_payments, public.case_documents, public.case_activity, public.customer_case_balances to authenticated;
 grant insert, update, delete on public.service_cases to authenticated;
-grant insert, update on public.case_payments to authenticated;
+grant insert on public.case_payments to authenticated;
 grant insert, update on public.case_documents to authenticated;
 grant insert, update, delete on public.case_activity to authenticated;
 
@@ -355,4 +349,5 @@ using (
 -- 2) Never expose the Supabase service_role key in browser code or GitHub.
 -- 3) Configure customer sign-up and email/OTP verification before production.
 -- 4) Test RLS with two separate customer accounts and one admin account.
+-- 5) Payment ledger rows are append-only; add a correction/refund row instead of editing history.
 -- 5) Do not store People/Document Services or flight/train/bus ticket-booking cases here.
