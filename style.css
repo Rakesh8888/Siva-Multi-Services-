@@ -2586,4 +2586,4 @@ footer{background:#e7f5fc !important;color:#5f7888 !important}
 .ai-chat-panel{height:380px!important;max-height:calc(100dvh - 90px)!important;}
 @media(max-width:700px){
   .ai-chat-panel{height:340px!important;max-height:calc(100dvh - 105px)!important;}
-}
+}(.ai-chat-panel{height:380px...})
