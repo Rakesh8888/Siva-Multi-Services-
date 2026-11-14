@@ -2985,6 +2985,7 @@ html body{perspective:none!important}
     if(panel.classList.contains('open'))closePanel();else openPanel();
   }
   function bind(){
+    ['aiFab','aiClose','voiceMsgBtn','liveVoiceBtn'].forEach(id=>{const el=byId(id);if(el&&!el.dataset.sivaRepairBound){const clone=el.cloneNode(true);clone.dataset.sivaRepairBound='1';el.replaceWith(clone)}});
     const fab=byId('aiFab'),close=byId('aiClose'),mic=byId('voiceMsgBtn'),live=byId('liveVoiceBtn');
     if(fab)fab.onclick=function(e){e.preventDefault();e.stopPropagation();togglePanel()};
     if(close)close.onclick=function(e){e.preventDefault();e.stopPropagation();closePanel()};
