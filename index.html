@@ -3050,6 +3050,8 @@ html body #aiPanel .aiHeader button,html body #aiPanel .aiHeader select{touch-ac
   const panel=document.getElementById('aiPanel');
   if(!fab||!panel||fab.dataset.finalDragOpenReady)return;
   fab.dataset.finalDragOpenReady='1';
+  // Remove the earlier click property handler so the launcher toggles exactly once.
+  fab.onclick=null;
   const header=panel.querySelector('.aiHeader');
   const clamp=(v,min,max)=>Math.max(min,Math.min(max,v));
   function setPosition(el,left,top){
