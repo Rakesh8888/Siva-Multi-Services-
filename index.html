@@ -1976,9 +1976,12 @@ function startNativeSpeech(mode){
 }
 async function startRecognition(mode,forceRecorder=false){
   recognitionMode=mode;
-  if(!forceRecorder&&SpeechRecognition&&startNativeSpeech(mode))return;
+  // Prefer MediaRecorder + the site's transcription API on Android Chrome.
+  // Browser SpeechRecognition can fail with network/service errors even when
+  // microphone permission is granted, so use it only when recording is unavailable.
   if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){
-    setVoiceStatus('ఈ బ్రౌజర్‌లో వాయిస్ గుర్తింపు అందుబాటులో లేదు. Android Chromeలో HTTPS వెబ్‌సైట్ తెరిచి Microphone అనుమతి ఇవ్వండి.');
+    if(!forceRecorder&&SpeechRecognition&&startNativeSpeech(mode))return;
+    setVoiceStatus('ఈ బ్రౌజర్‌లో వాయిస్ రికార్డింగ్ అందుబాటులో లేదు. Android Chromeలో HTTPS వెబ్‌సైట్ తెరిచి Microphone అనుమతి ఇవ్వండి.');
     return;
   }
   try{
