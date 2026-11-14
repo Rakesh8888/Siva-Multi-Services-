@@ -2948,6 +2948,93 @@ html body{perspective:none!important}
 
 </style>
 
+
+<style id="siva-ai-controls-repair">
+#aiPanel{display:none!important}
+#aiPanel.open{display:flex!important;flex-direction:column!important}
+#aiPanel:not(.open){visibility:hidden!important;pointer-events:none!important}
+#aiPanel.open{visibility:visible!important;pointer-events:auto!important}
+#aiPanel #aiClose,#aiPanel #voiceMsgBtn,#aiPanel #liveVoiceBtn,#aiFab{pointer-events:auto!important;touch-action:manipulation!important;cursor:pointer!important}
+#aiPanel #aiClose{position:relative!important;z-index:10!important;min-width:36px!important;min-height:36px!important}
+#aiPanel .aiBody{min-height:0!important}
+</style>
+<script id="siva-ai-controls-repair-script">
+(function(){
+  const byId=id=>document.getElementById(id);
+  function stopPlayback(){
+    try{if('speechSynthesis' in window)window.speechSynthesis.cancel()}catch(e){}
+  }
+  function closePanel(){
+    const panel=byId('aiPanel');
+    if(!panel)return;
+    try{if(typeof stopLiveVoice==='function')stopLiveVoice()}catch(e){}
+    try{if(typeof stopVoiceMessage==='function')stopVoiceMessage()}catch(e){}
+    stopPlayback();
+    panel.classList.remove('open');
+    panel.setAttribute('aria-hidden','true');
+  }
+  function openPanel(){
+    const panel=byId('aiPanel');
+    if(!panel)return;
+    panel.classList.add('open');
+    panel.setAttribute('aria-hidden','false');
+  }
+  function togglePanel(){
+    const panel=byId('aiPanel');
+    if(!panel)return;
+    if(panel.classList.contains('open'))closePanel();else openPanel();
+  }
+  function bind(){
+    const fab=byId('aiFab'),close=byId('aiClose'),mic=byId('voiceMsgBtn'),live=byId('liveVoiceBtn');
+    if(fab)fab.onclick=function(e){e.preventDefault();e.stopPropagation();togglePanel()};
+    if(close)close.onclick=function(e){e.preventDefault();e.stopPropagation();closePanel()};
+    if(mic)mic.onclick=function(e){
+      e.preventDefault();e.stopPropagation();
+      if(mic.classList.contains('active')){
+        try{if(typeof stopVoiceMessage==='function')stopVoiceMessage()}catch(err){}
+        mic.classList.remove('active');return;
+      }
+      try{if(typeof stopLiveVoice==='function'&&typeof liveVoice!=='undefined'&&liveVoice)stopLiveVoice()}catch(err){}
+      mic.classList.add('active');
+      const status=byId('voiceStatus');
+      if(status)status.textContent='మైక్రోఫోన్ అనుమతి అడుగుతున్నాను…';
+      if(typeof startRecognition==='function'){
+        Promise.resolve(startRecognition('message')).catch(err=>{
+          mic.classList.remove('active');
+          if(status)status.textContent='మైక్రోఫోన్ ప్రారంభం కాలేదు. HTTPS మరియు Microphone అనుమతిని తనిఖీ చేయండి.';
+        });
+      }else if(status)status.textContent='Voice service లోపం. పేజీని రిఫ్రెష్ చేసి మళ్లీ ప్రయత్నించండి.';
+    };
+    if(live)live.onclick=function(e){
+      e.preventDefault();e.stopPropagation();
+      try{
+        if(typeof liveVoice!=='undefined'&&liveVoice){
+          if(typeof stopLiveVoice==='function')stopLiveVoice();
+          return;
+        }
+        if(typeof stopVoiceMessage==='function')stopVoiceMessage();
+        if(typeof liveVoice!=='undefined')liveVoice=true;
+        if(typeof liveVoiceBusy!=='undefined')liveVoiceBusy=false;
+        live.classList.add('active');live.setAttribute('aria-pressed','true');
+        live.setAttribute('aria-label','Stop live voice');live.title='Stop live voice';
+        const status=byId('voiceStatus');
+        if(status)status.textContent='Live voice ప్రారంభమవుతోంది… Microphone అనుమతి ఇవ్వండి.';
+        if(typeof startRecognition==='function'){
+          Promise.resolve(startRecognition('live')).catch(err=>{
+            if(typeof stopLiveVoice==='function')stopLiveVoice();
+            if(status)status.textContent='Live voice ప్రారంభం కాలేదు. Chrome Microphone permission తనిఖీ చేయండి.';
+          });
+        }else if(status)status.textContent='Voice service లోపం. పేజీని రిఫ్రెష్ చేసి మళ్లీ ప్రయత్నించండి.';
+      }catch(err){
+        const status=byId('voiceStatus');if(status)status.textContent='వాయిస్ ప్రారంభం కాలేదు. మళ్లీ ప్రయత్నించండి.';
+      }
+    };
+  }
+  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
+  window.addEventListener('pageshow',bind);
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closePanel()});
+})();
+</script>
 </body>
 </html>/* SIVA AI chat card: smaller size */
 .ai-chat-panel{
