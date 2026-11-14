@@ -2582,3 +2582,8 @@ footer{background:#e7f5fc !important;color:#5f7888 !important}
 .globe-destination-picker button:hover,.globe-destination-picker button:focus-visible{background:rgba(255,157,46,.25);transform:translateY(-1px);outline:2px solid #ffb24b;outline-offset:2px}
 @media(max-width:760px){.globe-destination-picker{bottom:2%;width:min(96%,360px);gap:5px;padding:8px}.globe-destination-picker button{font-size:.7rem;padding:6px 8px}}
 @media(prefers-reduced-motion:reduce){.globe-destination-picker button{transition:none}}
+/* Lucky AI chat height reduce */
+.ai-chat-panel{height:380px!important;max-height:calc(100dvh - 90px)!important;}
+@media(max-width:700px){
+  .ai-chat-panel{height:340px!important;max-height:calc(100dvh - 105px)!important;}
+}
