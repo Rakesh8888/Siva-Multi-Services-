@@ -2986,4 +2986,19 @@ html body{perspective:none!important}
 </style>
 
 </body>
-</html>
+</html>/* SIVA AI chat card: smaller size */
+.ai-chat-panel{
+  width:min(330px,calc(100vw - 24px))!important;
+  height:400px!important;
+  max-height:calc(100dvh - 90px)!important;
+}
+@media(max-width:700px){
+  .ai-chat-panel{
+    width:calc(100vw - 24px)!important;
+    height:340px!important;
+    max-height:calc(100dvh - 105px)!important;
+  }
+}
+
+/* Floating button label: LUCKY → SIVA */
+.ai-chat-toggle::before{content:"SIVA"!important}
