@@ -1,5 +1,5 @@
 const json = (data, status = 200) => new Response(JSON.stringify(data), {
- status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" }
+ status, headers: { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store", "Access-Control-Allow-Origin": "*", "Access-Control-Allow-Methods": "GET, POST, OPTIONS", "Access-Control-Allow-Headers": "Content-Type, Authorization" }
 });
 const text = (value, max = 300) => String(value ?? "").trim().slice(0, max);
 const id = () => crypto.randomUUID();
