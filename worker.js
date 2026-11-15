@@ -1,3 +1,4 @@
+import { handleCrmRequest } from "./crm-api.js";
 const GEMINI_MODEL = "gemini-3.5-flash-lite";
 
 const RAG_EMBEDDING_MODEL = "@cf/baai/bge-m3";
@@ -556,6 +557,7 @@ async function handleChatFile(request, env) {
 export default {
   async fetch(request, env) {
     const url = new URL(request.url);
+    if (url.pathname.startsWith("/api/crm/")) return handleCrmRequest(request, env);
 
     if (request.method === "OPTIONS") return new Response(null, { status: 204, headers: corsHeaders(request) });
 
