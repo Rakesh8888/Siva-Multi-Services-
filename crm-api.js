@@ -6,7 +6,7 @@ const id = () => crypto.randomUUID();
 const code = prefix => prefix + "-" + new Date().toISOString().slice(0,10).replace(/-/g,"") + "-" + crypto.randomUUID().slice(0,6).toUpperCase();
 async function requireAdmin(request, env) {
  const expected = String(env.SIVA_ADMIN_TOKEN || "");
- const supplied = String(request.headers.get("Authorization") || "").replace(/^Bearer\\s+/i, "");
+ const supplied = String(request.headers.get("Authorization") || "").startsWith("Bearer ") ? String(request.headers.get("Authorization")).slice(7) : "";
  if (!expected || supplied.length !== expected.length) return false;
  let mismatch = 0;
  for (let i=0;i<expected.length;i++) mismatch |= expected.charCodeAt(i) ^ supplied.charCodeAt(i);
