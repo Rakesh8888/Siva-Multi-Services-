@@ -1856,7 +1856,7 @@ html body .aiPanel#aiPanel .chatComposer #liveVoiceBtn .voiceWaveIcon{
     </div>
   </div>
 </section>
-<footer class="footer"><div class="wrap footerin"><span>© <span id="year"></span> SIVA MULTI SERVICES. All rights reserved.</span><span>Flight offers require verification before booking. AI assistance is provided for general guidance.</span><nav class="legalFooterLinks" aria-label="Legal and policy links"><a href="#terms-of-use">Terms of Use</a><a href="#privacy-policy">Privacy Notice</a><a href="#cancellation-refund-policy">Cancellation & Refunds</a><a href="#travel-visa-disclaimer">Travel & Visa Disclaimer</a><a href="#cruise-career-disclaimer">Career Assistance Disclaimer</a><a href="#complaints-grievance">Complaints & Support</a><a href="#legal-policies">Official Resources</a></nav></div></footer><div class="wrap footerin"><span>© <span id="year"></span> SIVA MULTI SERVICES. All rights reserved.</span><span>Flight offers require verification before booking. AI assistance is provided for general guidance.</span></div></footer>
+<footer class="footer"><div class="wrap footerin"><span>© <span id="year"></span> SIVA MULTI SERVICES. All rights reserved.</span><span>Flight offers require verification before booking. AI assistance is provided for general guidance.</span><nav class="legalFooterLinks" aria-label="Legal and policy links"><a href="#terms-of-use">Terms of Use</a><a href="#privacy-policy">Privacy Notice</a><a href="#cancellation-refund-policy">Cancellation & Refunds</a><a href="#travel-visa-disclaimer">Travel & Visa Disclaimer</a><a href="#cruise-career-disclaimer">Career Assistance Disclaimer</a><a href="#complaints-grievance">Complaints & Support</a><a href="#legal-policies">Official Resources</a></nav></div></footer>
 <!-- SIVA MULTI SERVICES AI UI: Language options control removed from the visible interface; language follows the website selector. -->
 <span class="aiFabArrow" aria-hidden="true">↓</span> <button class="aiFab" id="aiFab" aria-label="Open Siva AI chatbot" title="Open Siva AI chatbot">SIVA</button>
 <div class="aiPanel" id="aiPanel">
@@ -3165,8 +3165,9 @@ html body #aiPanel .aiHeader button,html body #aiPanel .aiHeader select{touch-ac
  if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
 })();
 </script>
-</body>
-</html>/* SIVA AI chat card: smaller size */
+
+<style id="siva-ai-panel-fixes">
+/* SIVA AI chat card sizing and launcher label */
 .ai-chat-panel{
   width:min(330px,calc(100vw - 24px))!important;
   height:400px!important;
@@ -3179,6 +3180,7 @@ html body #aiPanel .aiHeader button,html body #aiPanel .aiHeader select{touch-ac
     max-height:calc(100dvh - 105px)!important;
   }
 }
-
-/* Floating button label: LUCKY → SIVA */
 .ai-chat-toggle::before{content:"SIVA"!important}
+</style>
+</body>
+</html>
