@@ -1702,6 +1702,40 @@ html body .aiPanel#aiPanel .chatComposer #liveVoiceBtn .voiceWaveIcon{
   #aiPanel #chat{height:112px!important;min-height:78px!important;max-height:112px!important}
 }
 </style>
+
+<style id="siva-quick-replies-permanent-override">
+/* Permanent high-specificity override for SIVA AI quick-action chips */
+html body .aiPanel#aiPanel .aiBody #sivaQuickReplies,
+html body #aiPanel .aiBody #sivaQuickReplies{
+  background:transparent!important;
+}
+html body .aiPanel#aiPanel .aiBody #sivaQuickReplies button,
+html body #aiPanel .aiBody #sivaQuickReplies button,
+html body #aiPanel #sivaQuickReplies button[data-message]{
+  background:#e8f3f8!important;
+  background-color:#e8f3f8!important;
+  color:#183f56!important;
+  border:1px solid #b9d4e2!important;
+  box-shadow:none!important;
+  text-shadow:none!important;
+}
+html body .aiPanel#aiPanel .aiBody #sivaQuickReplies button:hover,
+html body #aiPanel .aiBody #sivaQuickReplies button:hover{
+  background:#dceef6!important;
+  background-color:#dceef6!important;
+  color:#183f56!important;
+}
+html body .aiPanel#aiPanel .aiBody #sivaQuickReplies button:active,
+html body #aiPanel .aiBody #sivaQuickReplies button:active,
+html body .aiPanel#aiPanel .aiBody #sivaQuickReplies button:focus,
+html body #aiPanel .aiBody #sivaQuickReplies button:focus{
+  background:#cfe6f1!important;
+  background-color:#cfe6f1!important;
+  color:#183f56!important;
+  box-shadow:none!important;
+  outline-color:#8fbcd0!important;
+}
+</style>
 </head>
 <body class="light">
 <div class="topbar"><div class="wrap"><span>📍 Badvel, Andhra Pradesh, India</span><span id="headerDate" aria-label="Current date">28/10/2026(WED)</span></div></div>
