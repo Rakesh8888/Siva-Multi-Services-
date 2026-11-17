@@ -103,7 +103,10 @@ LANGUAGE:
 - Reply in ${language === "Auto Detect" ? "the same language the user used in their latest message (detect it yourself, including Romanized Telugu/Hindi and mixed Telugu-English)" : language} only, using its normal writing system. Telugu means natural Telugu script, not transliterated Telugu.
 - Always identify the language of the latest user message yourself. If Telugu is written in Latin letters (for example, “nenu ela cheyali”), answer in natural Telugu script. If Hindi is written in Latin letters, answer in Hindi script. If mixed, use the dominant language. Keep official names, URLs, job titles and technical terms unchanged where useful.
 - Do not begin in one language and switch to another unless the user asks.
-- TELUGU QUALITY: When replying in Telugu, use clear, everyday Andhra-style Telugu that an ordinary customer can easily understand. Use correct Telugu spelling and grammar. Prefer short, natural sentences. Do not produce random, broken, repetitive, or meaningless Telugu words. If you are unsure of a Telugu word, use a simple familiar Telugu-English phrase rather than inventing a word.
+- TELUGU QUALITY (STRICT): Write fluent, grammatically correct, everyday Andhra Telugu in Telugu script. Use short, complete sentences that sound like a helpful local customer-service representative. Prefer familiar wording such as “మీకు ఏ సేవ కావాలి?”, “దయచేసి వివరాలు పంపండి”, “నేను సహాయం చేస్తాను”. Never create fake Telugu words, join unrelated words, repeat phrases, or produce sentence fragments. Do not translate English word-by-word. Use a common English business term only when Telugu wording would sound unnatural.
+- Before sending a Telugu answer, silently check: (1) does every sentence have a clear meaning? (2) are spelling and grammar natural? (3) does it directly answer the latest question? Rewrite the answer if any check fails. Never show this checklist.
+- Keep the answer concise: normally 2–4 short sentences. Ask only one relevant follow-up question. Do not guess the customer's name, location, job, salary, visa status, or personal details.
+- LANGUAGE CONSISTENCY: The selected language supplied by the website takes priority. If it is English, answer in English even if earlier chat messages were Telugu. If it is Telugu, answer in Telugu. Use the latest message's language only when the website setting is Auto Detect.
 
 ROLE:
 Help with tours and travel, visa-application assistance, overseas-job application assistance, skilled and blue-collar jobs, and cruise-ship jobs. SIVA Multi Services provides enquiry and application assistance; do not imply it is an employer or an authorized recruiter unless verified.
@@ -288,8 +291,8 @@ async function handleChat(request, env) {
               systemInstruction: { parts: [{ text: systemPrompt }] },
               contents: geminiContents,
               generationConfig: {
-                maxOutputTokens: body?.spoken === true ? 180 : 600,
-                temperature: body?.spoken === true ? 0.2 : 0.3
+                maxOutputTokens: body?.spoken === true ? 150 : 480,
+                temperature: 0.15
               }
             }),
             signal: controller.signal
@@ -340,8 +343,8 @@ async function handleChat(request, env) {
           body: JSON.stringify({
             model: "llama-3.3-70b-versatile",
             messages: groqMessages,
-            max_tokens: body?.spoken === true ? 180 : 600,
-            temperature: body?.spoken === true ? 0.2 : 0.3
+            max_tokens: body?.spoken === true ? 150 : 480,
+            temperature: 0.15
           }),
           signal: controller.signal
         });
