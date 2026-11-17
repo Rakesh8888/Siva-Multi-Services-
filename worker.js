@@ -418,6 +418,9 @@ async function handleVoiceTranscription(request, env) {
     data.append("response_format", "json");
     const locale = ({te:"te",en:"en",hi:"hi",ta:"ta",kn:"kn",ml:"ml",ur:"ur",ar:"ar",bn:"bn"})[language];
     if (locale) data.append("language", locale);
+    if (locale === "te") {
+      data.append("prompt", "తెలుగు మాటలను తెలుగు లిపిలోనే రాయండి. సాధారణ ఆంధ్ర తెలుగు మాటలు: నమస్కారం, నాకు విమాన టికెట్ కావాలి, వీసా సహాయం కావాలి, టూర్ ప్యాకేజీలు, ఉద్యోగ వివరాలు, దయచేసి సహాయం చేయండి.");
+    }
     const response = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
       method: "POST",
       headers: { "Authorization": "Bearer " + env.GROQ_API_KEY },
