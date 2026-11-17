@@ -414,12 +414,14 @@ async function handleVoiceTranscription(request, env) {
     if (audio.size > 12 * 1024 * 1024) return jsonResponse({ error: "Voice recording is too large. Please record a shorter message." }, 413, request);
     const data = new FormData();
     data.append("file", audio, "siva-voice-" + Date.now() + (audio.type.includes("mp4") ? ".mp4" : ".webm"));
-    data.append("model", "whisper-large-v3-turbo");
-    data.append("response_format", "json");
+    // Use the full multilingual Whisper model for better Telugu recognition.
+    data.append("model", "whisper-large-v3");
+    data.append("response_format", "verbose_json");
+    data.append("temperature", "0");
     const locale = ({te:"te",en:"en",hi:"hi",ta:"ta",kn:"kn",ml:"ml",ur:"ur",ar:"ar",bn:"bn"})[language];
     if (locale) data.append("language", locale);
     if (locale === "te") {
-      data.append("prompt", "తెలుగు మాటలను తెలుగు లిపిలోనే రాయండి. సాధారణ ఆంధ్ర తెలుగు మాటలు: నమస్కారం, నాకు విమాన టికెట్ కావాలి, వీసా సహాయం కావాలి, టూర్ ప్యాకేజీలు, ఉద్యోగ వివరాలు, దయచేసి సహాయం చేయండి.");
+      data.append("prompt", "తెలుగు భాష. మాట్లాడిన మాటలను అచ్చంగా తెలుగు లిపిలో రాయండి. అనువదించవద్దు. సాధారణ ఆంధ్ర తెలుగు సంభాషణ. ఉదాహరణలు: నాకు టూర్ వెళ్లడానికి మంచి ప్రదేశాలు చెప్పగలరా? నాకు కువైట్ వెళ్లడానికి విమాన టికెట్ కావాలి. వీసా గురించి వివరాలు చెప్పండి. టికెట్ ధర ఎంత? టూర్ ప్యాకేజీలు కావాలి. దయచేసి సహాయం చేయండి.");
     }
     const response = await fetch("https://api.groq.com/openai/v1/audio/transcriptions", {
       method: "POST",
@@ -434,7 +436,7 @@ async function handleVoiceTranscription(request, env) {
     }
     const transcript = String(result?.text || "").trim();
     if (!transcript) return jsonResponse({ error: "No speech was detected. Please try speaking more clearly." }, 422, request);
-    return jsonResponse({ text: transcript, model: "whisper-large-v3-turbo" }, 200, request);
+    return jsonResponse({ text: transcript, model: "whisper-large-v3", language: result?.language || locale || "auto" }, 200, request);
   } catch (error) {
     console.error("SIVA voice transcription failed:", String(error?.message || error).slice(0, 180));
     return jsonResponse({ error: "Voice transcription could not be completed. Please try again." }, 502, request);
