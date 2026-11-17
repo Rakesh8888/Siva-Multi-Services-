@@ -1703,39 +1703,6 @@ html body .aiPanel#aiPanel .chatComposer #liveVoiceBtn .voiceWaveIcon{
 }
 </style>
 
-<style id="siva-quick-replies-permanent-override">
-/* Permanent high-specificity override for SIVA AI quick-action chips */
-html body .aiPanel#aiPanel .aiBody #sivaQuickReplies,
-html body #aiPanel .aiBody #sivaQuickReplies{
-  background:transparent!important;
-}
-html body .aiPanel#aiPanel .aiBody #sivaQuickReplies button,
-html body #aiPanel .aiBody #sivaQuickReplies button,
-html body #aiPanel #sivaQuickReplies button[data-message]{
-  background:#e8f3f8!important;
-  background-color:#e8f3f8!important;
-  color:#183f56!important;
-  border:1px solid #b9d4e2!important;
-  box-shadow:none!important;
-  text-shadow:none!important;
-}
-html body .aiPanel#aiPanel .aiBody #sivaQuickReplies button:hover,
-html body #aiPanel .aiBody #sivaQuickReplies button:hover{
-  background:#dceef6!important;
-  background-color:#dceef6!important;
-  color:#183f56!important;
-}
-html body .aiPanel#aiPanel .aiBody #sivaQuickReplies button:active,
-html body #aiPanel .aiBody #sivaQuickReplies button:active,
-html body .aiPanel#aiPanel .aiBody #sivaQuickReplies button:focus,
-html body #aiPanel .aiBody #sivaQuickReplies button:focus{
-  background:#cfe6f1!important;
-  background-color:#cfe6f1!important;
-  color:#183f56!important;
-  box-shadow:none!important;
-  outline-color:#8fbcd0!important;
-}
-</style>
 </head>
 <body class="light">
 <div class="topbar"><div class="wrap"><span>📍 Badvel, Andhra Pradesh, India</span><span id="headerDate" aria-label="Current date">28/10/2026(WED)</span></div></div>
@@ -1901,14 +1868,6 @@ html body #aiPanel .aiBody #sivaQuickReplies button:focus{
   </div>
   <div class="aiBody">
     <div class="chat" id="chat" aria-live="polite"><div class="msg bot">Hello Shiva! I am Siva AI. How can I help you today?</div></div>
-    <div id="sivaQuickReplies" class="sivaQuickReplies" aria-label="Quick questions">
-      <button type="button" data-message="Flight booking">✈️ Flight Booking</button>
-      <button type="button" data-message="Visa assistance">🛂 Visa Assistance</button>
-      <button type="button" data-message="Tourism and holiday packages">🌍 Tours &amp; Tourism</button>
-      <button type="button" data-message="Cruise jobs assistance">🚢 Cruise Jobs</button>
-      <button type="button" data-message="Overseas jobs assistance">💼 Overseas Jobs</button>
-      <button type="button" data-message="Contact Siva Multi Services">☎️ Contact Us</button>
-    </div>
     <form class="chatInput chatComposer" id="chatForm">
       <button type="button" class="composerIcon" id="chatPlus" aria-label="Show quick actions" title="Quick actions">＋</button>
       <input id="chatText" placeholder="Message Siva AI" autocomplete="off" aria-label="Message Siva AI">
@@ -3166,39 +3125,6 @@ html body #aiPanel .aiHeader button,html body #aiPanel .aiHeader select{touch-ac
 })();
 </script>
 
-<style id="siva-quick-replies-style">
-/* Light, friendly quick-reply buttons instead of dark/black buttons */
-#sivaQuickReplies{display:flex!important;flex-wrap:wrap!important;gap:6px!important;padding:7px 8px!important;max-height:92px!important;overflow-y:auto!important;flex:0 0 auto!important}
-#sivaQuickReplies button{border:1px solid #b9d4e2!important;background:#e8f3f8!important;color:#183f56!important;border-radius:16px!important;padding:7px 10px!important;min-height:30px!important;font-size:11px!important;line-height:1.25!important;white-space:normal!important;cursor:pointer!important;touch-action:manipulation!important}
-#sivaQuickReplies button:hover{background:#dceef6!important;border-color:#8fbcd0!important}
-#sivaQuickReplies button:active{background:#cfe6f1!important;transform:scale(.98)}
-@media(max-width:520px){#sivaQuickReplies{max-height:82px!important;gap:5px!important;padding:5px 6px!important}#sivaQuickReplies button{font-size:10px!important;padding:6px 8px!important;min-height:28px!important}}
-</style>
-<script id="siva-quick-replies-handler">
-(function(){
- function bind(){
-  const wrap=document.getElementById('sivaQuickReplies');
-  const input=document.getElementById('chatText');
-  if(!wrap||!input||wrap.dataset.bound)return;
-  wrap.dataset.bound='1';
-  wrap.addEventListener('click',function(e){
-   const button=e.target.closest('button[data-message]');
-   if(!button)return;
-   const message=button.getAttribute('data-message')||'';
-   if(!message)return;
-   input.value=message;
-   if(typeof processChat==='function'){
-    processChat(message);
-    input.value='';
-   }else{
-    const form=document.getElementById('chatForm');
-    if(form)form.requestSubmit();
-   }
-  });
- }
- if(document.readyState==='loading')document.addEventListener('DOMContentLoaded',bind,{once:true});else bind();
-})();
-</script>
 
 <style id="siva-ai-panel-fixes">
 /* SIVA AI chat card sizing and launcher label */
