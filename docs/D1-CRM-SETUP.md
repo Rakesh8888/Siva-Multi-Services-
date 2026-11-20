@@ -5,12 +5,13 @@ This change is deliberately isolated on branch `feature/siva-d1-customer-ledger`
 ## Files added
 - `migrations/0001_customer_crm.sql`: creates customers, service_records and payments tables.
 - `crm.js`: protected admin API for customers, services, payments and ledger summaries.
+- `crm-worker.js`: backward-compatible Worker entrypoint that sends only `/api/admin/*` requests to the CRM and forwards all existing requests to the original `worker.js`.
 
 ## Cloudflare steps still required
 1. In the existing D1 database `siva-business-db`, open **Query** and run the complete contents of `migrations/0001_customer_crm.sql`. Do not drop or delete existing tables.
 2. In the Worker settings, add a D1 database binding with variable name **DB** and select `siva-business-db`.
 3. Add a Worker secret named **ADMIN_API_TOKEN**. Generate a long random value and keep it private. Never commit it to GitHub or send it in chat.
-4. The current `worker.js` must import `handleCrmRequest` from `./crm.js` and dispatch `/api/admin/*` requests to it before the existing API routes. The exact integration is intentionally left as a small separate change so the existing AI/chat routes are not accidentally replaced.
+4. Change the Cloudflare Worker entrypoint from `worker.js` to `crm-worker.js`. This wrapper preserves the original AI/chat/voice/assets routes and handles only the new `/api/admin/*` paths.
 5. Deploy the Worker and test its API using an authenticated admin client. Do not expose the admin token in browser JavaScript.
 
 ## API endpoints after integration
