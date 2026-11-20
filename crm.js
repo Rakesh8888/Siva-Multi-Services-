@@ -17,7 +17,9 @@ async function requireAdmin(request, env) {
   const a = new TextEncoder().encode(supplied.slice(7));
   const b = new TextEncoder().encode(expected);
   if (a.length !== b.length) return false;
-  return crypto.subtle.timingSafeEqual ? crypto.subtle.timingSafeEqual(a, b) : supplied.slice(7) === expected;
+  let difference = 0;
+  for (let i = 0; i < a.length; i++) difference |= a[i] ^ b[i];
+  return difference === 0;
 }
 
 async function readJson(request) {
