@@ -1,8 +1,8 @@
 {
-  // Cloudflare Worker + static website deployment configuration
+  // Cloudflare Worker + website deployment configuration
   "$schema": "https://json.schemastore.org/wrangler.json",
   "name": "siva-multi-services",
-  "main": "./worker.js",
+  "main": "./crm-worker.js",
   "compatibility_date": "2026-10-06",
   "assets": {
     "directory": ".",
@@ -16,6 +16,14 @@
     {
       "binding": "SIVA_KNOWLEDGE",
       "index_name": "siva-ai-knowledge"
+    }
+  ],
+  "d1_databases": [
+    {
+      "binding": "DB",
+      "database_name": "siva-business-db",
+      "database_id": "00000015-00000000-00005129-0f9b409315ac962e85937d54a1418a43",
+      "migrations_dir": "migrations"
     }
   ]
 }
