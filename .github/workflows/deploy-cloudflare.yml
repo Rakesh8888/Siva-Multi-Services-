@@ -93,7 +93,7 @@ jobs:
         run: |
           node --input-type=module <<'NODE'
           import { readFileSync, writeFileSync } from "node:fs";
-          const token = (process.env.CLOUDFLARE_API_TOKEN || "").replace(/\\s+/g, "");
+          const token = (process.env.CLOUDFLARE_API_TOKEN || "").replace(/\s+/g, "");
           const account = process.env.CLOUDFLARE_ACCOUNT_ID;
           if (!token || !account) throw new Error("Cloudflare credentials are missing.");
           const response = await fetch(`https://api.cloudflare.com/client/v4/accounts/${account}/d1/database`, {
@@ -111,7 +111,7 @@ jobs:
           }
           const path = "wrangler.jsonc";
           const config = readFileSync(path, "utf8");
-          const updated = config.replace(/("database_id"\\s*:\\s*")[^"]+("\\s*,?)/, `$1${db.uuid}$2`);
+          const updated = config.replace(/("database_id"\s*:\s*")[^"]+("\s*,?)/, `$1${db.uuid}$2`);
           if (updated === config) throw new Error("Could not locate database_id in wrangler.jsonc; no config change was made.");
           writeFileSync(path, updated);
           console.log("Resolved siva-business-db from the current Cloudflare account and updated the deployment config.");
