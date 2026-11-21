@@ -73,7 +73,7 @@ export async function handleTrackingRequest(request,env){
         const b=await request.json().catch(()=>null); if(!b)return json({error:"Valid JSON required."},400);
         const stage=clean(b.stage,40); if(!VISA_STAGES.has(stage))return json({error:"Invalid visa stage."},400);
         const old=await env.DB.prepare("SELECT id,customer_id FROM visa_applications WHERE id=?").bind(vm[1]).first(); if(!old)return json({error:"Visa application not found."},404);
-        await env.DB.prepare("UPDATE visa_applications SET internal_stage=?,official_status=?,official_portal_url=?,application_reference=?,submitted_on=?,next_update_due=?,admin_notes=?,updated_at=? WHERE id=?")
+        await env.DB.prepare("UPDATE visa_applications SET internal_stage=?,official_status=COALESCE(?,official_status),official_portal_url=COALESCE(?,official_portal_url),application_reference=COALESCE(?,application_reference),submitted_on=COALESCE(?,submitted_on),next_update_due=COALESCE(?,next_update_due),admin_notes=COALESCE(?,admin_notes),updated_at=? WHERE id=?")
           .bind(stage,clean(b.officialStatus,180)||null,safeUrl(b.officialPortalUrl),clean(b.applicationReference,100)||null,clean(b.submittedOn,20)||null,clean(b.nextUpdateDue,20)||null,clean(b.adminNotes,1500)||null,isoNow(),vm[1]).run();
         await addUpdate(env,old.customer_id,"visa",vm[1],stage,clean(b.customerNote,1000)||"Visa application progress updated.",b.visibleToCustomer!==false);
         return json({ok:true});
@@ -84,7 +84,7 @@ export async function handleTrackingRequest(request,env){
         const stage=clean(b.stage,40),cv=clean(b.cvStage,40);
         if(!CRUISE_STAGES.has(stage)||!CV_STAGES.has(cv))return json({error:"Invalid cruise/CV stage."},400);
         const old=await env.DB.prepare("SELECT id,customer_id FROM cruise_applications WHERE id=?").bind(cm[1]).first(); if(!old)return json({error:"Cruise application not found."},404);
-        await env.DB.prepare("UPDATE cruise_applications SET application_stage=?,cv_stage=?,employer_reference=?,applied_on=?,interview_on=?,admin_notes=?,updated_at=? WHERE id=?")
+        await env.DB.prepare("UPDATE cruise_applications SET application_stage=?,cv_stage=?,employer_reference=COALESCE(?,employer_reference),applied_on=COALESCE(?,applied_on),interview_on=COALESCE(?,interview_on),admin_notes=COALESCE(?,admin_notes),updated_at=? WHERE id=?")
           .bind(stage,cv,clean(b.employerReference,100)||null,clean(b.appliedOn,20)||null,clean(b.interviewOn,20)||null,clean(b.adminNotes,1500)||null,isoNow(),cm[1]).run();
         await addUpdate(env,old.customer_id,"cruise",cm[1],stage,clean(b.customerNote,1000)||"Cruise application progress updated.",b.visibleToCustomer!==false);
         return json({ok:true});
