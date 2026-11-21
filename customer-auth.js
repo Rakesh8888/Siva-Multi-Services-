@@ -5,7 +5,7 @@ const randomHex = n => { const b=new Uint8Array(n); crypto.getRandomValues(b); r
 async function digest(value){ return hex(await crypto.subtle.digest("SHA-256", enc.encode(value))); }
 async function pinHash(pin,salt){
  const key=await crypto.subtle.importKey("raw",enc.encode(pin),"PBKDF2",false,["deriveBits"]);
- const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:Uint8Array.from(salt.match(/../g),x=>parseInt(x,16)),iterations:210000,hash:"SHA-256"},key,256);
+ const bits=await crypto.subtle.deriveBits({name:"PBKDF2",salt:Uint8Array.from(salt.match(/../g),x=>parseInt(x,16)),iterations:100000,hash:"SHA-256"},key,256);
  return hex(bits);
 }
 async function adminOk(request,env){
