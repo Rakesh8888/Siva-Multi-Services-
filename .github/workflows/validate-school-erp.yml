@@ -16,7 +16,7 @@ jobs:
           node-version: "22"
       - name: JavaScript syntax
         run: |
-          node --check products/school-erp/worker.js
+          node --input-type=module --check < products/school-erp/worker.js
           node --check products/school-erp/public/app.js
           node --check products/school-erp/public/brand.config.js
       - name: Validate database schema
