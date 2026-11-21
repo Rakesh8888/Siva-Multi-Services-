@@ -77,6 +77,22 @@ export default {
   if(!user) return json({error:"Please sign in to continue."},401);
   if(path==="/api/me"&&method==="GET") return json({user:{id:user.id,name:user.full_name,email:user.email,role:user.role}});
   const school=env.SCHOOL_ID;
+  if(path==="/api/users"&&method==="GET") {
+    const denied=requireRole(user,"*"); if(denied)return denied;
+    const r=await env.DB.prepare("SELECT id,full_name,email,role,linked_student_id,active,created_at FROM users WHERE school_id=? ORDER BY created_at DESC").bind(school).all();
+    return json({items:r.results});
+  }
+  if(path==="/api/users"&&method==="POST") {
+    const denied=requireRole(user,"*"); if(denied)return denied;
+    const b=await body(request),name=clean(b.fullName,120),email=clean(b.email,180).toLowerCase(),password=String(b.password||""),role=clean(b.role,20),studentId=clean(b.linkedStudentId,36);
+    if(!name||!email.includes("@")||password.length<12||!["teacher","accountant","parent","student"].includes(role))return json({error:"Enter name, valid email, password of at least 12 characters, and an allowed role."},400);
+    if((role==="parent"||role==="student")&&!studentId)return json({error:"Link a student record to parent/student accounts."},400);
+    if(studentId){const s=await env.DB.prepare("SELECT id FROM students WHERE id=? AND school_id=?").bind(studentId,school).first();if(!s)return json({error:"Linked student not found."},404);}
+    const userId=id(),hash=await passwordHash(password);
+    try{await env.DB.prepare("INSERT INTO users(id,school_id,full_name,email,password_hash,role,linked_student_id) VALUES(?,?,?,?,?,?,?)").bind(userId,school,name,email,hash,role,studentId||null).run();}
+    catch{return json({error:"Email already exists in this school."},409);}
+    return json({ok:true,id:userId},201);
+  }
   if(path==="/api/classes"&&method==="GET") {
     const denied=requireRole(user,"classes:read"); if(denied)return denied;
     const r=await env.DB.prepare("SELECT id,class_name,section,academic_year FROM classes WHERE school_id=? ORDER BY class_name,section").bind(school).all();
@@ -131,7 +147,8 @@ export default {
   }
   if(path==="/api/fees"&&method==="GET") {
     const denied=requireRole(user,user.role==="parent"||user.role==="student"?"portal:read":"fees:read"); if(denied)return denied;
-    const r=await env.DB.prepare("SELECT f.id,f.invoice_no,f.fee_type,f.amount_paise,f.due_date,f.status,f.academic_year,s.admission_no,s.first_name,s.last_name,COALESCE((SELECT SUM(p.amount_paise) FROM fee_payments p WHERE p.invoice_id=f.id AND p.school_id=f.school_id),0) AS paid_paise FROM fee_invoices f JOIN students s ON s.id=f.student_id AND s.school_id=f.school_id WHERE f.school_id=? ORDER BY f.created_at DESC LIMIT 300").bind(school).all();
+    const sql="SELECT f.id,f.invoice_no,f.fee_type,f.amount_paise,f.due_date,f.status,f.academic_year,s.admission_no,s.first_name,s.last_name,COALESCE((SELECT SUM(p.amount_paise) FROM fee_payments p WHERE p.invoice_id=f.id AND p.school_id=f.school_id),0) AS paid_paise FROM fee_invoices f JOIN students s ON s.id=f.student_id AND s.school_id=f.school_id WHERE f.school_id=?"+((user.role==="parent"||user.role==="student")?" AND f.student_id=(SELECT linked_student_id FROM users WHERE id=? AND school_id=?)":"")+" ORDER BY f.created_at DESC LIMIT 300";
+    const r=(user.role==="parent"||user.role==="student")?await env.DB.prepare(sql).bind(school,user.id,school).all():await env.DB.prepare(sql).bind(school).all();
     return json({items:r.results});
   }
   if(path==="/api/fees"&&method==="POST") {
@@ -160,7 +177,7 @@ export default {
   }
   if(path==="/api/notices"&&method==="GET") {
     const denied=requireRole(user,"notices:read"); if(denied)return denied;
-    const r=await env.DB.prepare("SELECT id,title,body,audience,published,created_at FROM notices WHERE school_id=? AND (published=1 OR ?='admin') ORDER BY created_at DESC LIMIT 100").bind(school,user.role).all();
+    const r=await env.DB.prepare("SELECT id,title,body,audience,published,created_at FROM notices WHERE school_id=? AND (?='admin' OR (published=1 AND (audience='all' OR audience=?))) ORDER BY created_at DESC LIMIT 100").bind(school,user.role,user.role==="teacher"?"teachers":user.role==="parent"?"parents":user.role==="student"?"students":"all").all();
     return json({items:r.results});
   }
   if(path==="/api/notices"&&method==="POST") {
