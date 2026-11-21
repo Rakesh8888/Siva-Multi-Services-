@@ -21,12 +21,14 @@ async function sessionCustomer(request,env){
 }
 export async function handleCustomerAuthRequest(request,env){
  const url=new URL(request.url),path=url.pathname;
+ let authenticatedAdminPinRequest=false;
  if(!path.startsWith("/api/customer/") && !/^\/api\/admin\/customers\/[a-f0-9-]+\/pin$/i.test(path))return null;
  if(!env.DB)return json({error:"Database is not configured."},503);
  try{
   if(path.startsWith("/api/admin/")){
    if(request.method!=="POST")return json({error:"Method not allowed."},405);
    if(!(await adminOk(request,env)))return json({error:"Unauthorized."},401);
+   authenticatedAdminPinRequest=true;
    const id=path.match(/^\/api\/admin\/customers\/([a-f0-9-]+)\/pin$/i)?.[1];
    const body=await request.json().catch(()=>null),pin=String(body?.pin||"");
    if(!id||!/^\d{4}$/.test(pin))return json({error:"Set a 4-digit PIN."},400);
@@ -72,5 +74,5 @@ export async function handleCustomerAuthRequest(request,env){
    return json({customer:{customerCode:customer.customer_code,fullName:customer.full_name},services:ss,payments:ps,summary:{totalFeePaise:fee,totalPaidPaise:paid,balancePaise:fee-paid}});
   }
   return json({error:"Customer endpoint not found."},404);
- }catch(e){console.error("Customer portal error",String(e?.message||e));return json({error:"Customer portal request failed."},500);}
+ }catch(e){const detail=String(e?.message||e||"Unknown error").slice(0,180);console.error("Customer portal error",detail);return authenticatedAdminPinRequest?json({error:"Customer PIN save failed.",detail},500):json({error:"Customer portal request failed."},500);}
 }
