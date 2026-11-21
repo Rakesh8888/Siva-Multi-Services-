@@ -29,7 +29,7 @@ export async function handleCustomerAuthRequest(request,env){
    if(!(await adminOk(request,env)))return json({error:"Unauthorized."},401);
    const id=path.match(/^\/api\/admin\/customers\/([a-f0-9-]+)\/pin$/i)?.[1];
    const body=await request.json().catch(()=>null),pin=String(body?.pin||"");
-   if(!id||!/^\d{6}$/.test(pin))return json({error:"Set a 6-digit PIN."},400);
+   if(!id||!/^\d{4}$/.test(pin))return json({error:"Set a 4-digit PIN."},400);
    const customer=await env.DB.prepare("SELECT id FROM customers WHERE id=?").bind(id).first();
    if(!customer)return json({error:"Customer not found."},404);
    const salt=randomHex(16),hash=await pinHash(pin,salt);
@@ -39,7 +39,7 @@ export async function handleCustomerAuthRequest(request,env){
   }
   if(path==="/api/customer/login"&&request.method==="POST"){
    const body=await request.json().catch(()=>null),code=String(body?.customerId||"").trim().toUpperCase(),pin=String(body?.pin||"");
-   if(!code||!/^\d{6}$/.test(pin))return json({error:"Enter Customer ID and 6-digit PIN."},400);
+   if(!code||!/^\d{4}$/.test(pin))return json({error:"Enter Customer ID and 4-digit PIN."},400);
    const customer=await env.DB.prepare("SELECT c.id,c.customer_code,c.full_name,a.pin_salt,a.pin_hash FROM customers c JOIN customer_auth a ON a.customer_id=c.id WHERE c.customer_code=?").bind(code).first();
    if(!customer)return json({error:"Invalid Customer ID or PIN."},401);
    const attempt=await env.DB.prepare("SELECT failed_count,locked_until FROM customer_login_attempts WHERE customer_code=?").bind(code).first();
