@@ -73,6 +73,7 @@ export default {
     });
   }
   if(path==="/api/logout"&&method==="POST") return json({ok:true},200,{"set-cookie":"school_session=; HttpOnly; Secure; SameSite=Strict; Path=/; Max-Age=0"});
+  if(!path.startsWith("/api/") && env.ASSETS) return env.ASSETS.fetch(request);
   const user=await currentUser(request,env);
   if(!user) return json({error:"Please sign in to continue."},401);
   if(path==="/api/me"&&method==="GET") return json({user:{id:user.id,name:user.full_name,email:user.email,role:user.role}});
