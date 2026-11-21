@@ -46,12 +46,12 @@ export async function handleCrmRequest(request, env) {
       const search = clean(url.searchParams.get("q"), 80);
       const result = search
         ? await env.DB.prepare(`SELECT c.id,c.customer_code,c.full_name,c.phone,c.email,c.created_at,
-            COALESCE((SELECT SUM(s.fee_paise) FROM service_records s WHERE s.customer_id=c.id),0) AS total_fee_paise,
+            COALESCE((SELECT SUM(s.fee_paise) FROM service_records s WHERE s.customer_id=c.id AND lower(s.service_name) NOT LIKE '%people service%' AND lower(s.service_name) NOT LIKE '%ticket%'),0) AS total_fee_paise,
             COALESCE((SELECT SUM(p.amount_paise) FROM payments p WHERE p.customer_id=c.id),0) AS total_paid_paise
           FROM customers c WHERE c.full_name LIKE ? OR c.phone LIKE ? OR c.customer_code LIKE ?
           ORDER BY c.created_at DESC LIMIT 100`).bind("%"+search+"%","%"+search+"%","%"+search+"%").all()
         : await env.DB.prepare(`SELECT c.id,c.customer_code,c.full_name,c.phone,c.email,c.created_at,
-            COALESCE((SELECT SUM(s.fee_paise) FROM service_records s WHERE s.customer_id=c.id),0) AS total_fee_paise,
+            COALESCE((SELECT SUM(s.fee_paise) FROM service_records s WHERE s.customer_id=c.id AND lower(s.service_name) NOT LIKE '%people service%' AND lower(s.service_name) NOT LIKE '%ticket%'),0) AS total_fee_paise,
             COALESCE((SELECT SUM(p.amount_paise) FROM payments p WHERE p.customer_id=c.id),0) AS total_paid_paise
           FROM customers c ORDER BY c.created_at DESC LIMIT 100`).all();
       return json({ customers: result.results || [] });
