@@ -7,10 +7,11 @@ const clean = (value, max = 200) => String(value ?? "").trim().slice(0, max);
 const moneyToPaise = (value) => {
   const amount = Number(value);
   if (!Number.isFinite(amount) || amount < 0 || amount > 100000000) return null;
+  return Math.round(amount * 100);
 };
 const isExcludedService = (value) => {
   const name = String(value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
-  return /\\bpeople services?\\b/.test(name) || /\\btickets?\\b/.test(name);
+  return /\bpeople services?\b/.test(name) || /\btickets?\b/.test(name);
 };
 
 async function requireAdmin(request, env) {
