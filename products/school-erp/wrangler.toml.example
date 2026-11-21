@@ -1,0 +1,16 @@
+name = "school-erp-replace-for-each-school"
+main = "worker.js"
+compatibility_date = "2026-11-22"
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+not_found_handling = "single-page-application"
+
+[vars]
+SCHOOL_ID = "replace-with-unique-school-id"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "replace-with-school-database-name"
+database_id = "00000000-0000-0000-0000-000000000000"
