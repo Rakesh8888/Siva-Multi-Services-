@@ -42,8 +42,11 @@ export async function handleCustomerAuthRequest(request,env){
   if(path==="/api/customer/login"&&request.method==="POST"){
    const body=await request.json().catch(()=>null),code=String(body?.customerId||"").trim().toUpperCase(),pin=String(body?.pin||"");
    if(!code||!/^\d{4}$/.test(pin))return json({error:"Enter Customer ID and 4-digit PIN."},400);
-   const customer=await env.DB.prepare("SELECT c.id,c.customer_code,c.full_name,a.pin_salt,a.pin_hash FROM customers c JOIN customer_auth a ON a.customer_id=c.id WHERE c.customer_code=?").bind(code).first();
-   if(!customer)return json({error:"Invalid Customer ID or PIN."},401);
+   const matches=await env.DB.prepare("SELECT c.id,c.customer_code,c.full_name,a.pin_salt,a.pin_hash FROM customers c JOIN customer_auth a ON a.customer_id=c.id WHERE upper(trim(c.customer_code))=? OR lower(trim(c.full_name))=lower(?)").bind(code,code).all();
+   const found=matches.results||[];
+   if(found.length>1)return json({error:"More than one customer has this name. Please use the Customer Code (SIVA-XXXXXXXX)."},409);
+   const customer=found[0];
+   if(!customer)return json({error:"Invalid Customer ID or PIN. Enter the exact customer name or Customer Code."},401);
    const attempt=await env.DB.prepare("SELECT failed_count,locked_until FROM customer_login_attempts WHERE customer_code=?").bind(code).first();
    if(attempt?.locked_until && attempt.locked_until>new Date().toISOString())return json({error:"Too many attempts. Try again later."},429);
    const valid=(await pinHash(pin,customer.pin_salt))===customer.pin_hash;
