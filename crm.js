@@ -7,7 +7,10 @@ const clean = (value, max = 200) => String(value ?? "").trim().slice(0, max);
 const moneyToPaise = (value) => {
   const amount = Number(value);
   if (!Number.isFinite(amount) || amount < 0 || amount > 100000000) return null;
-  return Math.round(amount * 100);
+};
+const isExcludedService = (value) => {
+  const name = String(value ?? "").toLowerCase().replace(/[^a-z0-9]+/g, " ").trim();
+  return /\\bpeople services?\\b/.test(name) || /\\btickets?\\b/.test(name);
 };
 
 async function requireAdmin(request, env) {
@@ -85,6 +88,7 @@ export async function handleCrmRequest(request, env) {
       const serviceName = clean(body.serviceName, 120);
       const feePaise = moneyToPaise(body.fee);
       if (!serviceName || feePaise === null) return json({ error: "Enter a service name and valid fee." }, 400);
+      if (isExcludedService(serviceName)) return json({ error: "People Services and ticket booking are intentionally excluded from CRM records and customer balances." }, 400);
       const id = crypto.randomUUID();
       await env.DB.prepare(`INSERT INTO service_records (id,customer_id,service_name,fee_paise,status,notes)
         VALUES (?,?,?,?,?,?)`).bind(id,customerId,serviceName,feePaise,clean(body.status,30) || "pending",clean(body.notes,1000) || null).run();
@@ -96,17 +100,20 @@ export async function handleCrmRequest(request, env) {
       if (!body) return json({ error: "A valid JSON body is required." }, 400);
       const amountPaise = moneyToPaise(body.amount);
       const method = clean(body.method, 40);
-      if (amountPaise === null || amountPaise <= 0 || !method) return json({ error: "Enter a valid payment amount and method." }, 400);
+      const serviceRecordId = clean(body.serviceRecordId, 80);
+      if (amountPaise === null || amountPaise <= 0 || !method || !serviceRecordId) return json({ error: "Select a trackable service and enter a valid payment amount and method." }, 400);
+      const service = await env.DB.prepare("SELECT id,service_name FROM service_records WHERE id=? AND customer_id=?").bind(serviceRecordId,customerId).first();
+      if (!service || isExcludedService(service.service_name)) return json({ error: "Payment must be linked to an eligible service record." }, 400);
       const id = crypto.randomUUID();
-      await env.DB.prepare(`INSERT INTO payments (id,customer_id,amount_paise,method,reference,note)
-        VALUES (?,?,?,?,?,?)`).bind(id,customerId,amountPaise,method,clean(body.reference,120) || null,clean(body.note,500) || null).run();
+      await env.DB.prepare(`INSERT INTO payments (id,customer_id,service_record_id,amount_paise,method,reference,note)
+        VALUES (?,?,?,?,?,?,?)`).bind(id,customerId,serviceRecordId,amountPaise,method,clean(body.reference,120) || null,clean(body.note,500) || null).run();
       return json({ ok: true, payment: { id, customerId, amountPaise, method } }, 201);
     }
 
     if (action === "ledger" && request.method === "GET") {
       const [services, payments] = await Promise.all([
-        env.DB.prepare("SELECT id,service_name,fee_paise,status,notes,created_at FROM service_records WHERE customer_id=? ORDER BY created_at DESC").bind(customerId).all(),
-        env.DB.prepare("SELECT id,amount_paise,method,reference,note,created_at FROM payments WHERE customer_id=? ORDER BY created_at DESC").bind(customerId).all()
+        env.DB.prepare("SELECT id,service_name,fee_paise,status,notes,created_at FROM service_records WHERE customer_id=? AND lower(service_name) NOT LIKE '%people service%' AND lower(service_name) NOT LIKE '%ticket%' ORDER BY created_at DESC").bind(customerId).all(),
+        env.DB.prepare("SELECT p.id,p.amount_paise,p.method,p.reference,p.note,p.created_at,s.service_name FROM payments p LEFT JOIN service_records s ON s.id=p.service_record_id WHERE p.customer_id=? ORDER BY p.created_at DESC").bind(customerId).all()
       ]);
       const totalFeePaise = (services.results || []).reduce((sum, item) => sum + item.fee_paise, 0);
       const totalPaidPaise = (payments.results || []).reduce((sum, item) => sum + item.amount_paise, 0);
