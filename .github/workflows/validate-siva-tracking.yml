@@ -1,0 +1,78 @@
+name: Validate Siva tracking changes
+
+on:
+  pull_request:
+    branches:
+      - main
+    paths:
+      - "tracking.js"
+      - "crm.js"
+      - "customer-auth.js"
+      - "crm-worker.js"
+      - "tracking-admin.html"
+      - "customer-tracking.html"
+      - "customer-portal.html"
+      - "crm-admin.html"
+      - "migrations/**"
+      - ".github/workflows/validate-siva-tracking.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Check server JavaScript syntax
+        run: |
+          node --check tracking.js
+          node --check crm.js
+          node --check customer-auth.js
+          node --check crm-worker.js
+
+      - name: Check inline browser JavaScript syntax
+        run: |
+          python3 - <<'PY'
+          import pathlib, re, subprocess
+          files = ["tracking-admin.html", "customer-tracking.html", "customer-portal.html", "crm-admin.html"]
+          for name in files:
+              source = pathlib.Path(name).read_text(encoding="utf-8")
+              scripts = re.findall(r"<script[^>]*>(.*?)</script>", source, re.S | re.I)
+              for index, script in enumerate(scripts):
+                  if not script.strip():
+                      continue
+                  target = pathlib.Path("/tmp") / f"{name}.{index}.js"
+                  target.write_text(script, encoding="utf-8")
+                  subprocess.run(["node", "--check", str(target)], check=True)
+          print("Inline browser scripts passed syntax checks.")
+          PY
+
+      - name: Validate all D1 migrations in order
+        run: |
+          python3 - <<'PY'
+          import pathlib, sqlite3
+          db = sqlite3.connect(":memory:")
+          migrations = [
+              "migrations/0001_customer_crm.sql",
+              "migrations/0002_customer_portal.sql",
+              "migrations/0003_siva_service_tracking.sql",
+              "migrations/0004_link_payments_to_services.sql",
+          ]
+          for name in migrations:
+              db.executescript(pathlib.Path(name).read_text(encoding="utf-8"))
+              print(f"Applied locally: {name}")
+          tables = {row[0] for row in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+          required = {"customers", "service_records", "payments", "visa_applications", "cruise_applications", "visa_document_checklist", "tracking_updates"}
+          missing = required - tables
+          if missing:
+              raise SystemExit(f"Missing tables: {sorted(missing)}")
+          columns = {row[1] for row in db.execute("PRAGMA table_info(payments)")}
+          if "service_record_id" not in columns:
+              raise SystemExit("payments.service_record_id column missing")
+          print("D1 schema migration validation passed.")
+          PY

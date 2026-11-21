@@ -70,8 +70,8 @@ export async function handleCustomerAuthRequest(request,env){
   if(path==="/api/customer/me"&&request.method==="GET")return json({customer:{customerCode:customer.customer_code,fullName:customer.full_name}});
   if(path==="/api/customer/ledger"&&request.method==="GET"){
    const [services,payments]=await Promise.all([
-    env.DB.prepare("SELECT service_name,fee_paise,status,created_at FROM service_records WHERE customer_id=? ORDER BY created_at DESC").bind(customer.id).all(),
-    env.DB.prepare("SELECT amount_paise,method,created_at FROM payments WHERE customer_id=? ORDER BY created_at DESC").bind(customer.id).all()
+    env.DB.prepare("SELECT service_name,fee_paise,status,created_at FROM service_records WHERE customer_id=? AND lower(service_name) NOT LIKE '%people service%' AND lower(service_name) NOT LIKE '%ticket%' ORDER BY created_at DESC").bind(customer.id).all(),
+    env.DB.prepare("SELECT p.amount_paise,p.method,p.created_at,s.service_name FROM payments p LEFT JOIN service_records s ON s.id=p.service_record_id WHERE p.customer_id=? ORDER BY p.created_at DESC").bind(customer.id).all()
    ]);
    const ss=services.results||[],ps=payments.results||[],fee=ss.reduce((n,x)=>n+x.fee_paise,0),paid=ps.reduce((n,x)=>n+x.amount_paise,0);
    return json({customer:{customerCode:customer.customer_code,fullName:customer.full_name},services:ss,payments:ps,summary:{totalFeePaise:fee,totalPaidPaise:paid,balancePaise:fee-paid}});
