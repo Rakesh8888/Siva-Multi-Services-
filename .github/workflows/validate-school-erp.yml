@@ -1,0 +1,37 @@
+name: Validate standalone School ERP
+
+on:
+  pull_request:
+    paths:
+      - "products/school-erp/**"
+      - ".github/workflows/validate-school-erp.yml"
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: JavaScript syntax
+        run: |
+          node --input-type=module --check < products/school-erp/worker.js
+          node --check products/school-erp/public/app.js
+          node --check products/school-erp/public/brand.config.js
+      - name: Validate database schema
+        run: |
+          python3 - <<'PY'
+          import sqlite3, pathlib
+          db=sqlite3.connect(":memory:")
+          db.executescript(pathlib.Path("products/school-erp/schema.sql").read_text())
+          required={"users","classes","students","attendance","fee_invoices","fee_payments","exams","exam_marks","notices","audit_log"}
+          actual={r[0] for r in db.execute("SELECT name FROM sqlite_master WHERE type='table'")}
+          missing=required-actual
+          if missing: raise SystemExit(f"Missing tables: {sorted(missing)}")
+          print("School ERP schema validation passed.")
+          PY
+      - name: Check white-label deployment placeholders
+        run: |
+          grep -q 'replace-with-unique-school-id' products/school-erp/wrangler.toml.example
+          grep -q 'database_id = "00000000-0000-0000-0000-000000000000"' products/school-erp/wrangler.toml.example
