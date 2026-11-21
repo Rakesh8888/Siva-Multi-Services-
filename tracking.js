@@ -29,7 +29,12 @@ async function listAdmin(env,customerId){
     env.DB.prepare("SELECT * FROM visa_applications WHERE customer_id=? ORDER BY updated_at DESC").bind(customerId).all(),
     env.DB.prepare("SELECT * FROM cruise_applications WHERE customer_id=? ORDER BY updated_at DESC").bind(customerId).all()
   ]);
-  return {visa:visa.results||[],cruise:cruise.results||[]};
+  const visaRows=visa.results||[];
+  for(const v of visaRows){
+    const docs=await env.DB.prepare("SELECT id,document_name,document_status,customer_note,updated_at FROM visa_document_checklist WHERE visa_id=? ORDER BY document_name").bind(v.id).all();
+    v.documents=docs.results||[];
+  }
+  return {visa:visaRows,cruise:cruise.results||[]};
 }
 export async function handleTrackingRequest(request,env){
   const url=new URL(request.url),path=url.pathname,method=request.method;
